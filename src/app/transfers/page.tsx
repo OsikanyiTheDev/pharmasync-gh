@@ -13,20 +13,20 @@ export default function TransfersPage() {
     <div className="space-y-6 text-slate-900 dark:text-white pb-12">
       
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg">
         <div className="flex items-center space-x-3">
-          <div className="p-2.5 bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-400 rounded-xl border border-teal-200 dark:border-teal-500/20">
+          <div className="bg-[#4E60FF] p-3 rounded-xl text-white shadow-xs">
             <RefreshCw className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900 dark:text-slate-100">Inter-Branch Stock Transfer Audit Log</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Track dispatched & received stock shipments between physical branches</p>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white">Inter-Branch Stock Transfer Audit Log</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Track dispatched & received stock shipments between physical branches</p>
           </div>
         </div>
 
         <button
           onClick={() => setIsTransferModalOpen(true)}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white font-bold text-xs rounded-xl shadow-md transition-all"
+          className="flex items-center space-x-2 px-4 py-2.5 bg-[#4E60FF] hover:bg-[#3D4FE6] text-white font-medium text-xs rounded-xl shadow-md transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>New Stock Transfer</span>
@@ -36,7 +36,7 @@ export default function TransfersPage() {
       {/* Transfers List */}
       <div className="space-y-3">
         {transfers.length === 0 ? (
-          <div className="bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center text-slate-500 dark:text-slate-400">
+          <div className="bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl p-8 text-center text-slate-400">
             No inter-branch transfers recorded yet.
           </div>
         ) : (
@@ -47,7 +47,7 @@ export default function TransfersPage() {
             return (
               <div
                 key={trf.id}
-                className="bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-xs hover:border-teal-500 transition-all"
+                className="bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl p-5 space-y-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg hover:border-[#4E60FF] transition-all"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
                   <div>

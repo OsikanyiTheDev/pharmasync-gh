@@ -102,10 +102,10 @@ export default function RestockPage() {
               <div
                 key={p.id}
                 onClick={() => toggleCheckItem(p.id)}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer shadow-xs flex flex-col space-y-3 ${
+                className={`p-5 rounded-2xl border transition-all cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg flex flex-col space-y-3 ${
                   isChecked
                     ? 'bg-emerald-50/60 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 opacity-70'
-                    : 'bg-white dark:bg-[#131b2e] border-slate-200 dark:border-slate-800 hover:border-teal-500'
+                    : 'bg-white dark:bg-[#222327] border-slate-100/60 dark:border-white/5 hover:border-[#4E60FF]'
                 }`}
               >
                 

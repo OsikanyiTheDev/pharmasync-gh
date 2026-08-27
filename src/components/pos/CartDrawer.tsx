@@ -70,7 +70,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 text-slate-900 flex flex-col justify-between space-y-4">
+    <div className="bg-white dark:bg-[#222327] rounded-2xl border border-slate-100/60 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg p-5 text-slate-900 dark:text-white flex flex-col justify-between space-y-4">
       
       {/* Top Header: Dispensing Slip Title & Hold Actions */}
       <div>
@@ -318,7 +318,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           <button
             disabled={cart.length === 0}
             onClick={onOpenCashModal}
-            className="flex items-center justify-center space-x-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 text-white font-extrabold text-xs rounded-xl shadow-sm transition-all"
+            className="flex items-center justify-center space-x-1.5 py-3 bg-[#10B981] hover:bg-emerald-600 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-semibold text-xs rounded-xl shadow-md transition-all cursor-pointer"
             title="Exact Cash Pay [F4]"
           >
             <Banknote className="w-4 h-4" />
@@ -328,7 +328,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           <button
             disabled={cart.length === 0}
             onClick={onOpenMoMoModal}
-            className="flex items-center justify-center space-x-1.5 py-2.5 bg-teal-700 hover:bg-teal-800 disabled:bg-slate-200 text-white font-extrabold text-xs rounded-xl shadow-sm transition-all"
+            className="flex items-center justify-center space-x-1.5 py-3 bg-[#4E60FF] hover:bg-[#3D4FE6] disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-semibold text-xs rounded-xl shadow-md transition-all cursor-pointer"
             title="MoMo / Split Pay [F9]"
           >
             <CreditCard className="w-4 h-4" />

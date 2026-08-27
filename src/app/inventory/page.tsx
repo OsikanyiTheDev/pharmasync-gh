@@ -17,13 +17,11 @@ import {
   SlidersHorizontal, 
   Search, 
   Layers, 
-  TrendingUp,
   ChevronDown,
   ChevronRight,
-  ShieldAlert,
   MapPin,
-  Tag,
-  FileSpreadsheet
+  FileSpreadsheet,
+  AlertCircle
 } from 'lucide-react';
 
 export default function InventoryPage() {
@@ -40,18 +38,22 @@ export default function InventoryPage() {
   const [adjustTargetProduct, setAdjustTargetProduct] = useState<Product | null>(null);
   const [adjustTargetBatch, setAdjustTargetBatch] = useState<Batch | null>(null);
 
-  // Branch Stock Comparison Counts
-  const branchStockCounts = branches.map(b => {
-    const branchBatches = batches.filter(batch => batch.branchId === b.id);
-    const totalQty = branchBatches.reduce((acc, batch) => acc + batch.quantity, 0);
-    const lowStockCount = products.filter(p => {
-      const pBatches = branchBatches.filter(bt => bt.productId === p.id);
-      const sum = pBatches.reduce((a, bt) => a + bt.quantity, 0);
-      return sum <= 15;
-    }).length;
+  // Summary Metrics Calculation
+  const activeBatches = batches.filter(
+    b => selectedBranchFilter === 'ALL' || b.branchId === selectedBranchFilter
+  );
 
-    return { branch: b, totalQty, lowStockCount };
-  });
+  const totalStockPacks = activeBatches.reduce((acc, b) => acc + b.quantity, 0);
+
+  const healthyCount = activeBatches.filter(b => getBatchExpiryStatus(b.expiryDate).status === 'HEALTHY').length;
+  const expiringSoonCount = activeBatches.filter(b => getBatchExpiryStatus(b.expiryDate).status === 'EXPIRING_SOON').length;
+  const expiredCount = activeBatches.filter(b => getBatchExpiryStatus(b.expiryDate).status === 'EXPIRED').length;
+
+  const lowStockCount = products.filter(p => {
+    const pBatches = activeBatches.filter(bt => bt.productId === p.id);
+    const sum = pBatches.reduce((a, bt) => a + bt.quantity, 0);
+    return sum <= (p.reorderLevel || 15);
+  }).length;
 
   // Filter products
   const filteredProducts = products.filter(product => {
@@ -62,7 +64,6 @@ export default function InventoryPage() {
       product.genericName.toLowerCase().includes(q) ||
       product.category.toLowerCase().includes(q);
 
-    // Get batches for this product matching branch filter
     const productBatches = batches.filter(
       b => b.productId === product.id && (selectedBranchFilter === 'ALL' || b.branchId === selectedBranchFilter)
     );
@@ -86,93 +87,108 @@ export default function InventoryPage() {
   };
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-slate-100 pb-12">
+    <div className="space-y-6 text-slate-900 dark:text-white pb-12">
       
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg">
         <div className="flex items-center space-x-3">
-          <div className="p-2.5 bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-400 rounded-xl border border-teal-200 dark:border-teal-500/20">
+          <div className="bg-[#4E60FF] p-3 rounded-xl text-white shadow-xs">
             <Package className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900 dark:text-slate-100">Multi-Branch Inventory & Medical Ledger</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Track stock levels, location shelves, and FEFO expiry status across branches</p>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white">Multi-Branch Inventory Ledger</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Track stock levels, FEFO expiry batches, and location shelves across branches</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
           <Link
             href="/inventory/import"
-            className="flex items-center space-x-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-teal-800 dark:text-teal-300 font-bold text-xs rounded-xl border border-slate-300 dark:border-slate-700 shadow-xs transition-all"
+            className="flex items-center space-x-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#161719] dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 font-medium text-xs rounded-xl border border-slate-200 dark:border-white/5 transition-all"
           >
-            <FileSpreadsheet className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+            <FileSpreadsheet className="w-4 h-4 text-[#4E60FF]" />
             <span>Bulk Import CSV</span>
           </Link>
 
           <button
             onClick={() => setIsTransferModalOpen(true)}
-            className="flex items-center space-x-2 px-4 py-2.5 bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs rounded-xl shadow-md transition-all"
+            className="flex items-center space-x-2 px-4 py-2.5 bg-[#4E60FF] hover:bg-[#3D4FE6] text-white font-medium text-xs rounded-xl shadow-md transition-all cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
-            <span>New Inter-Branch Transfer</span>
+            <span>Inter-Branch Transfer</span>
           </button>
         </div>
       </div>
 
-      {/* Branch Comparison Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {branchStockCounts.map(({ branch, totalQty, lowStockCount }) => (
-          <div
-            key={branch.id}
-            onClick={() => setSelectedBranchFilter(branch.id)}
-            className={`p-4 rounded-2xl border transition-all cursor-pointer shadow-xs ${
-              selectedBranchFilter === branch.id
-                ? 'bg-teal-50 border-teal-600 text-teal-900 dark:bg-teal-950/60 dark:text-teal-100 dark:border-teal-500 shadow-sm ring-2 ring-teal-600/30'
-                : 'bg-white text-slate-900 border-slate-200 hover:border-teal-500 dark:bg-[#131b2e] dark:text-slate-100 dark:border-slate-800'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className={`text-xs font-bold ${selectedBranchFilter === branch.id ? 'text-teal-800 dark:text-teal-300' : 'text-slate-500 dark:text-slate-400'}`}>
-                {branch.name}
-              </span>
-              <Building2 className={`w-4 h-4 ${selectedBranchFilter === branch.id ? 'text-teal-700 dark:text-teal-300' : 'text-teal-600 dark:text-teal-400'}`} />
-            </div>
-
-            <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-black tabular-nums">
-                {totalQty.toLocaleString()} <span className="text-xs font-normal opacity-80">packs</span>
-              </p>
-
-              {lowStockCount > 0 && (
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                  selectedBranchFilter === branch.id
-                    ? 'bg-amber-200 text-amber-900 border border-amber-300 dark:bg-amber-400 dark:text-slate-950'
-                    : 'bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
-                }`}>
-                  {lowStockCount} Low Stock
-                </span>
-              )}
-            </div>
+      {/* KPI Stat Metric Cards Row (Circular Icon Design Spec) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        {/* Total Stock Packs - Blue Circle */}
+        <div className="p-5 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg flex items-center space-x-4">
+          <div className="bg-[#4E60FF] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
+            <Package className="w-6 h-6" />
           </div>
-        ))}
+          <div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Stock Quantity</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{totalStockPacks.toLocaleString()} <span className="text-xs font-normal">packs</span></p>
+            <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">{products.length} catalog items</span>
+          </div>
+        </div>
+
+        {/* Healthy FEFO Batches - Emerald Circle */}
+        <div className="p-5 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg flex items-center space-x-4">
+          <div className="bg-[#10B981] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Healthy Stock (&gt;90 Days)</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{healthyCount} <span className="text-xs font-normal">batches</span></p>
+            <span className="text-[#10B981] text-xs font-semibold">Safe Shelf Life</span>
+          </div>
+        </div>
+
+        {/* Expiring Soon - Amber Circle */}
+        <div className="p-5 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg flex items-center space-x-4">
+          <div className="bg-[#F59E0B] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
+            <Clock className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Expiring Soon (&le;90 Days)</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{expiringSoonCount} <span className="text-xs font-normal">batches</span></p>
+            <span className="text-[#F59E0B] text-xs font-semibold">Prioritize FEFO Dispensing</span>
+          </div>
+        </div>
+
+        {/* Low / Out of Stock - Rose Circle */}
+        <div className="p-5 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg flex items-center space-x-4">
+          <div className="bg-[#EF4444] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Low / Reorder Alert</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{lowStockCount} <span className="text-xs font-normal">medicines</span></p>
+            <span className="text-[#EF4444] text-xs font-semibold">Requires Restock Intake</span>
+          </div>
+        </div>
+
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 p-4 rounded-2xl space-y-4 shadow-xs">
+      <div className="bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 p-5 rounded-2xl space-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
           {/* Branch Switcher Pills */}
           <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs">
-            <span className="font-bold text-slate-500 dark:text-slate-400 mr-1 flex items-center">
-              <Building2 className="w-3.5 h-3.5 mr-1 text-teal-600 dark:text-teal-400" /> Filter Branch:
+            <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1 flex items-center">
+              <Building2 className="w-3.5 h-3.5 mr-1 text-[#4E60FF]" /> Branch:
             </span>
 
             <button
               onClick={() => setSelectedBranchFilter('ALL')}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+              className={`px-3.5 py-2 rounded-xl font-medium transition-all cursor-pointer ${
                 selectedBranchFilter === 'ALL'
-                  ? 'bg-teal-700 text-white shadow-xs dark:bg-teal-600'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
+                  ? 'bg-[#4E60FF] text-white shadow-xs font-semibold'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-[#161719] dark:text-slate-300'
               }`}
             >
               All 3 Branches
@@ -182,13 +198,13 @@ export default function InventoryPage() {
               <button
                 key={b.id}
                 onClick={() => setSelectedBranchFilter(b.id as BranchId)}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                className={`px-3.5 py-2 rounded-xl font-medium transition-all cursor-pointer ${
                   selectedBranchFilter === b.id
-                    ? 'bg-teal-700 text-white shadow-xs dark:bg-teal-600'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
+                    ? 'bg-[#4E60FF] text-white shadow-xs font-semibold'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-[#161719] dark:text-slate-300'
                 }`}
               >
-                {b.name.split(' ')[0]} {b.name.split(' ')[1]}
+                {b.name}
               </button>
             ))}
           </div>
@@ -201,20 +217,20 @@ export default function InventoryPage() {
               placeholder="Search product or category..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-600"
+              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-[#161719] border border-slate-200/80 dark:border-white/10 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E60FF]"
             />
           </div>
 
         </div>
 
         {/* Expiry Health Tabs */}
-        <div className="flex items-center space-x-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-          <span className="font-bold text-slate-500 dark:text-slate-400 mr-1">Expiry Health:</span>
+        <div className="flex items-center space-x-2 pt-3 border-t border-slate-100 dark:border-white/5 text-xs">
+          <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1">Expiry Health:</span>
 
           <button
             onClick={() => setSelectedExpiryFilter('ALL')}
-            className={`px-2.5 py-1 rounded-lg font-bold ${
-              selectedExpiryFilter === 'ALL' ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`px-3 py-1.5 rounded-lg font-medium cursor-pointer ${
+              selectedExpiryFilter === 'ALL' ? 'bg-[#4E60FF]/10 text-[#4E60FF] font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
             All Statuses
@@ -222,56 +238,66 @@ export default function InventoryPage() {
 
           <button
             onClick={() => setSelectedExpiryFilter('HEALTHY')}
-            className={`px-2.5 py-1 rounded-lg font-bold flex items-center space-x-1 ${
-              selectedExpiryFilter === 'HEALTHY' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 cursor-pointer ${
+              selectedExpiryFilter === 'HEALTHY' ? 'bg-[#10B981]/10 text-[#10B981] font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
             <span>Healthy (&gt;90d)</span>
           </button>
 
           <button
             onClick={() => setSelectedExpiryFilter('EXPIRING_SOON')}
-            className={`px-2.5 py-1 rounded-lg font-bold flex items-center space-x-1 ${
-              selectedExpiryFilter === 'EXPIRING_SOON' ? 'bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 cursor-pointer ${
+              selectedExpiryFilter === 'EXPIRING_SOON' ? 'bg-[#F59E0B]/10 text-[#F59E0B] font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
-            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            <Clock className="w-3.5 h-3.5 text-[#F59E0B]" />
             <span>Expiring Soon (&le;90d)</span>
           </button>
 
           <button
             onClick={() => setSelectedExpiryFilter('EXPIRED')}
-            className={`px-2.5 py-1 rounded-lg font-bold flex items-center space-x-1 ${
-              selectedExpiryFilter === 'EXPIRED' ? 'bg-rose-100 text-rose-900 border border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 cursor-pointer ${
+              selectedExpiryFilter === 'EXPIRED' ? 'bg-[#EF4444]/10 text-[#EF4444] font-semibold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+            <AlertTriangle className="w-3.5 h-3.5 text-[#EF4444]" />
             <span>Expired</span>
           </button>
         </div>
       </div>
 
-      {/* Interactive Medical Data Table */}
-      <div className="bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
+      {/* Interactive Medical Data Table Container */}
+      <div className="bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg space-y-4">
+        
+        {/* Header Title with "See All >" link */}
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
+          <div className="flex items-center space-x-2">
+            <Package className="w-5 h-5 text-[#4E60FF]" />
+            <h3 className="font-bold text-base text-slate-900 dark:text-white">Active Medicine Stock Inventory</h3>
+          </div>
+          <span className="text-[#4E60FF] text-xs font-semibold hover:underline cursor-pointer">See All &gt;</span>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-800 dark:text-slate-200">
-            <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200 dark:bg-[#0b0f19] dark:text-slate-300 dark:border-slate-800 uppercase tracking-wider">
+            <thead className="text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider py-3 border-b border-slate-100 dark:border-white/5">
               <tr>
-                <th className="py-3.5 px-4"></th>
-                <th className="py-3.5 px-3">Medicine & Dosage</th>
-                <th className="py-3.5 px-3">Category</th>
-                <th className="py-3.5 px-3 text-center">Total Stock</th>
-                <th className="py-3.5 px-3 text-right">Unit Cost (GH₵)</th>
-                <th className="py-3.5 px-3 text-right">Unit Sell (GH₵)</th>
-                <th className="py-3.5 px-3 text-right">Margin %</th>
-                <th className="py-3.5 px-4 text-center">Actions</th>
+                <th className="py-3 px-4"></th>
+                <th className="py-3 px-3">Medicine & Dosage</th>
+                <th className="py-3 px-3">Category</th>
+                <th className="py-3 px-3 text-center">Total Stock</th>
+                <th className="py-3 px-3 text-right">Unit Cost (GH₵)</th>
+                <th className="py-3 px-3 text-right">Unit Sell (GH₵)</th>
+                <th className="py-3 px-3 text-right">Margin %</th>
+                <th className="py-3 px-4 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            <tbody className="divide-y divide-slate-50 dark:divide-white/5">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400 dark:text-slate-500">
+                  <td colSpan={8} className="py-12 text-center text-slate-400">
                     No medicines found matching the active filter selections.
                   </td>
                 </tr>
@@ -290,54 +316,54 @@ export default function InventoryPage() {
                       {/* Main Product Row */}
                       <tr 
                         onClick={() => toggleExpand(product.id)}
-                        className={`hover:bg-teal-50/50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${isExpanded ? 'bg-teal-50/70 dark:bg-slate-800/70 font-semibold' : ''}`}
+                        className={`hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors ${isExpanded ? 'bg-slate-50 dark:bg-white/5 font-semibold' : ''}`}
                       >
-                        <td className="py-3 px-4 text-slate-400">
-                          {isExpanded ? <ChevronDown className="w-4 h-4 text-teal-700 dark:text-teal-400" /> : <ChevronRight className="w-4 h-4" />}
+                        <td className="py-3.5 px-4 text-slate-400">
+                          {isExpanded ? <ChevronDown className="w-4 h-4 text-[#4E60FF]" /> : <ChevronRight className="w-4 h-4" />}
                         </td>
 
-                        <td className="py-3 px-3">
-                          <p className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">{product.brandName}</p>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400">{product.genericName} • {product.strength} ({product.dosageForm})</p>
+                        <td className="py-3.5 px-3">
+                          <p className="font-bold text-slate-900 dark:text-white text-sm">{product.brandName}</p>
+                          <p className="text-[11px] text-slate-400">{product.genericName} • {product.strength} ({product.dosageForm})</p>
                         </td>
 
-                        <td className="py-3 px-3 font-semibold text-slate-700 dark:text-slate-300">
-                          <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 text-[11px]">
+                        <td className="py-3.5 px-3 font-medium text-slate-700 dark:text-slate-300">
+                          <span className="px-2.5 py-1 bg-slate-100 dark:bg-[#161719] rounded-lg text-[11px]">
                             {product.category}
                           </span>
                         </td>
 
-                        <td className="py-3 px-3 text-center">
-                          <span className={`px-2.5 py-0.5 rounded-full font-black text-xs tabular-nums ${
+                        <td className="py-3.5 px-3 text-center">
+                          <span className={`px-2.5 py-1 rounded-full font-bold text-xs tabular-nums ${
                             totalUnits === 0
-                              ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800'
+                              ? 'bg-[#EF4444]/10 text-[#EF4444]'
                               : totalUnits <= 15
-                              ? 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
-                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
+                              ? 'bg-[#F59E0B]/10 text-[#F59E0B]'
+                              : 'bg-[#10B981]/10 text-[#10B981]'
                           }`}>
                             {totalUnits} packs
                           </span>
                         </td>
 
-                        <td className="py-3 px-3 text-right font-mono tabular-nums text-slate-600 dark:text-slate-400">
+                        <td className="py-3.5 px-3 text-right font-mono tabular-nums text-slate-500">
                           GH₵ {product.costPrice.toFixed(2)}
                         </td>
 
-                        <td className="py-3 px-3 text-right font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100">
+                        <td className="py-3.5 px-3 text-right font-mono font-bold tabular-nums text-slate-900 dark:text-white">
                           GH₵ {product.retailPrice.toFixed(2)}
                         </td>
 
-                        <td className="py-3 px-3 text-right font-bold text-teal-800 dark:text-teal-400 tabular-nums">
+                        <td className="py-3.5 px-3 text-right font-bold text-[#10B981] tabular-nums">
                           {marginPercent.toFixed(1)}%
                         </td>
 
-                        <td className="py-3 px-4 text-center">
+                        <td className="py-3.5 px-4 text-center">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleExpand(product.id);
                             }}
-                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold"
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#161719] dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium cursor-pointer"
                           >
                             {isExpanded ? 'Hide Batches' : `View Batches (${productBatches.length})`}
                           </button>
@@ -346,20 +372,20 @@ export default function InventoryPage() {
 
                       {/* Expandable Batches Sub-Table Drawer */}
                       {isExpanded && (
-                        <tr className="bg-slate-50 border-b border-slate-200 dark:bg-[#0b0f19] dark:border-slate-800">
+                        <tr className="bg-slate-50/50 dark:bg-[#161719]">
                           <td colSpan={8} className="p-4">
-                            <div className="bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-inner space-y-2">
-                              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2 mb-2">
-                                <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100 flex items-center">
-                                  <Layers className="w-4 h-4 text-teal-700 dark:text-teal-400 mr-1.5" />
+                            <div className="bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-xl p-4 space-y-2">
+                              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-2 mb-2">
+                                <h4 className="font-bold text-xs text-slate-900 dark:text-white flex items-center">
+                                  <Layers className="w-4 h-4 text-[#4E60FF] mr-1.5" />
                                   Active FEFO Batches for {product.brandName}
                                 </h4>
-                                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">{productBatches.length} batch(es) listed</span>
+                                <span className="text-[11px] text-slate-400">{productBatches.length} batch(es) listed</span>
                               </div>
 
-                              <div className="space-y-1.5">
+                              <div className="space-y-2">
                                 {productBatches.length === 0 ? (
-                                  <p className="text-xs text-slate-500 dark:text-slate-400 py-2">No active batches recorded for this medicine in active selection.</p>
+                                  <p className="text-xs text-slate-400 py-2">No active batches recorded for this medicine in active selection.</p>
                                 ) : (
                                   productBatches.map(b => {
                                     const expInfo = getBatchExpiryStatus(b.expiryDate);
@@ -368,38 +394,38 @@ export default function InventoryPage() {
                                     return (
                                       <div
                                         key={b.id}
-                                        className="p-2.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs"
+                                        className="p-3 bg-slate-50 dark:bg-[#161719] border border-slate-100/60 dark:border-white/5 rounded-xl flex items-center justify-between text-xs"
                                       >
                                         <div className="flex items-center space-x-3">
-                                          <span className="font-mono font-bold text-teal-800 bg-teal-50 dark:bg-teal-950/60 dark:text-teal-300 px-2 py-0.5 rounded border border-teal-200 dark:border-teal-800">
+                                          <span className="font-mono font-bold text-[#4E60FF] bg-[#4E60FF]/10 px-2 py-0.5 rounded">
                                             {b.batchNumber}
                                           </span>
                                           <span className="font-semibold text-slate-700 dark:text-slate-300">{branchName}</span>
-                                          <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center">
+                                          <span className="text-[11px] text-slate-400 flex items-center">
                                             <MapPin className="w-3 h-3 text-slate-400 mr-0.5" />
                                             {b.locationShelf || 'Main Shelf'}
                                           </span>
                                         </div>
 
                                         <div className="flex items-center space-x-4">
-                                          <span className="text-slate-600 dark:text-slate-400 font-semibold">Qty: <b className="text-slate-900 dark:text-slate-100 font-mono">{b.quantity}</b></span>
-                                          <span className="text-slate-600 dark:text-slate-400 font-mono">Exp: {b.expiryDate}</span>
+                                          <span className="text-slate-500 font-medium">Qty: <b className="text-slate-900 dark:text-white font-mono">{b.quantity}</b></span>
+                                          <span className="text-slate-500 font-mono">Exp: {b.expiryDate}</span>
 
-                                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                                             expInfo.status === 'EXPIRED'
-                                              ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-300'
+                                              ? 'bg-[#EF4444]/10 text-[#EF4444]'
                                               : expInfo.status === 'EXPIRING_SOON'
-                                              ? 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/60 dark:border-amber-800 dark:text-amber-300'
-                                              : 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/60 dark:border-emerald-800 dark:text-emerald-300'
+                                              ? 'bg-[#F59E0B]/10 text-[#F59E0B]'
+                                              : 'bg-[#10B981]/10 text-[#10B981]'
                                           }`}>
                                             {expInfo.label}
                                           </span>
 
                                           <button
                                             onClick={() => handleOpenAdjustModal(product, b)}
-                                            className="px-2 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded font-bold text-[11px] flex items-center space-x-1"
+                                            className="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-[#222327] dark:hover:bg-white/10 text-slate-800 dark:text-slate-200 rounded font-medium text-[11px] flex items-center space-x-1 cursor-pointer"
                                           >
-                                            <SlidersHorizontal className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                                            <SlidersHorizontal className="w-3 h-3 text-[#F59E0B]" />
                                             <span>Adjust</span>
                                           </button>
                                         </div>

@@ -63,7 +63,7 @@ export const ProductSearch: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 text-slate-900 flex flex-col space-y-4">
+    <div className="bg-white dark:bg-[#222327] rounded-2xl border border-slate-100/60 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg p-5 text-slate-900 dark:text-white flex flex-col space-y-4">
       
       {/* Search Input Bar */}
       <div className="relative">
@@ -76,7 +76,7 @@ export const ProductSearch: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search drug brand, generic name, or dosage form... (Press / or F2)"
-          className="block w-full pl-11 pr-24 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent transition-all shadow-inner"
+          className="block w-full pl-11 pr-24 py-3 bg-slate-50 dark:bg-[#161719] border border-slate-200/80 dark:border-white/10 rounded-xl text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E60FF] focus:border-transparent transition-all"
         />
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
           <kbd className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono font-bold bg-slate-200 text-slate-700 rounded border border-slate-300">
