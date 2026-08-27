@@ -36,19 +36,19 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, sale, onClos
 
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl max-w-4xl w-full p-6 text-slate-900 dark:text-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative flex flex-col max-h-[92vh]">
+      <div className="bg-white border border-slate-100/60 rounded-2xl max-w-4xl w-full p-6 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative flex flex-col max-h-[92vh]">
         
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-3 mb-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
           <div className="flex items-center space-x-2">
             <div className="p-2 bg-[#4E60FF]/10 text-[#4E60FF] rounded-xl border border-[#4E60FF]/20">
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">Official Dispensing Receipt</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Invoice Ref: <span className="font-mono text-[#4E60FF] font-bold">{sale.receiptNumber}</span></p>
+              <h3 className="font-bold text-base text-slate-900">Official Dispensing Receipt</h3>
+              <p className="text-xs text-slate-500">Invoice Ref: <span className="font-mono text-[#4E60FF] font-bold">{sale.receiptNumber}</span></p>
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-50">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -93,20 +93,20 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, sale, onClos
               <MessageSquare className="w-4 h-4" />
               <span>WhatsApp Customer Share Preview</span>
             </div>
-            <div className="bg-[#F3F4F7] dark:bg-[#161719] p-4 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm flex-1 flex flex-col justify-between font-sans">
-              <div className="bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/5 text-slate-900 dark:text-white p-3.5 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed shadow-sm overflow-y-auto max-h-[360px]">{whatsappText}</div>
-              <div className="mt-3 text-[10px] text-slate-500 dark:text-slate-400 text-center">Phone Target: <b className="text-[#4E60FF] font-mono">{sale.payment.customerPhone || 'Not specified (Walk-in)'}</b></div>
+            <div className="bg-[#F3F4F7] p-4 rounded-2xl border border-slate-100 shadow-sm flex-1 flex flex-col justify-between font-sans">
+              <div className="bg-white border border-slate-100 text-slate-900 p-3.5 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed shadow-sm overflow-y-auto max-h-[360px]">{whatsappText}</div>
+              <div className="mt-3 text-[10px] text-slate-500 text-center">Phone Target: <b className="text-[#4E60FF] font-mono">{sale.payment.customerPhone || 'Not specified (Walk-in)'}</b></div>
             </div>
             <div className="space-y-2">
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" onClick={() => showToast('Opening WhatsApp Web...', 'info')} className="w-full flex items-center justify-center space-x-2 py-2.5 bg-[#10B981] hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-sm transition-all"><Share2 className="w-4 h-4" /><span>1-Click Send via WhatsApp</span><ExternalLink className="w-3.5 h-3.5" /></a>
-              <button onClick={handleCopyWhatsAppText} className="w-full py-2 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5"><Copy className="w-3.5 h-3.5" /><span>{copiedWhatsApp ? 'Copied Message!' : 'Copy Text Message'}</span></button>
+              <button onClick={handleCopyWhatsAppText} className="w-full py-2 bg-[#F3F4F7] border border-slate-100 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5"><Copy className="w-3.5 h-3.5" /><span>{copiedWhatsApp ? 'Copied Message!' : 'Copy Text Message'}</span></button>
             </div>
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between no-print">
+        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between no-print">
           <button onClick={handlePrintReceipt} className="flex items-center space-x-2 px-5 py-2.5 bg-[#4E60FF] hover:bg-[#3D4FE6] text-white rounded-xl text-xs font-bold transition-all shadow-sm"><Printer className="w-4 h-4" /><span>Print Invoice (A4 / A5)</span></button>
-          <button onClick={onClose} className="px-5 py-2.5 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100 dark:border-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-50 rounded-xl text-xs font-bold transition-all">Next Sale</button>
+          <button onClick={onClose} className="px-5 py-2.5 bg-[#F3F4F7] border border-slate-100 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-bold transition-all">Next Sale</button>
         </div>
       </div>
     </div>

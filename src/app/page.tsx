@@ -123,20 +123,20 @@ export default function POSPage() {
   };
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-white pb-12">
+    <div className="space-y-6 text-slate-900 pb-12">
       
       {/* 1. Top Dashboard Row (4 Metric Stat Cards with Circular Badges) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Card 1: Blue circle - Total Customers */}
-        <div className="p-5 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
+        <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="bg-[#4E60FF] text-white p-3.5 rounded-full shadow-sm flex items-center justify-center">
               <Users className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Customers</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{120 + activeSales.length}</p>
+              <p className="text-xs text-slate-500 font-medium">Total Customers</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">{120 + activeSales.length}</p>
               <Link href="/analytics" className="text-[#4E60FF] text-xs font-semibold hover:underline flex items-center mt-0.5">
                 Show Details &gt;
               </Link>
@@ -145,14 +145,14 @@ export default function POSPage() {
         </div>
 
         {/* Card 2: Green circle - Total Sales */}
-        <div className="p-5 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
+        <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="bg-[#10B981] text-white p-3.5 rounded-full shadow-sm flex items-center justify-center">
               <DollarSign className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Sales in GH₵</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">GH₵ {totalRevenue.toFixed(2)}</p>
+              <p className="text-xs text-slate-500 font-medium">Total Sales in GH₵</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">GH₵ {totalRevenue.toFixed(2)}</p>
               <Link href="/analytics" className="text-[#10B981] text-xs font-semibold hover:underline flex items-center mt-0.5">
                 Show Details &gt;
               </Link>
@@ -161,14 +161,14 @@ export default function POSPage() {
         </div>
 
         {/* Card 3: Amber circle - Gross Profit */}
-        <div className="p-5 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
+        <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="bg-[#F59E0B] text-white p-3.5 rounded-full shadow-sm flex items-center justify-center">
               <Percent className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Gross Profit</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">GH₵ {grossProfit.toFixed(2)}</p>
+              <p className="text-xs text-slate-500 font-medium">Gross Profit</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">GH₵ {grossProfit.toFixed(2)}</p>
               <Link href="/analytics" className="text-[#F59E0B] text-xs font-semibold hover:underline flex items-center mt-0.5">
                 Show Details &gt;
               </Link>
@@ -177,14 +177,14 @@ export default function POSPage() {
         </div>
 
         {/* Card 4: Red circle - Low / Out of Stock */}
-        <div className="p-5 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
+        <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="bg-[#EF4444] text-white p-3.5 rounded-full shadow-sm flex items-center justify-center">
               <AlertCircle className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Low / Out of Stock</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">{lowStockCount} items</p>
+              <p className="text-xs text-slate-500 font-medium">Low / Out of Stock</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">{lowStockCount} items</p>
               <Link href="/inventory" className="text-[#EF4444] text-xs font-semibold hover:underline flex items-center mt-0.5">
                 Show Details &gt;
               </Link>
@@ -199,13 +199,13 @@ export default function POSPage() {
         
         {/* Left Column (70% - 8 cols on lg screen) */}
         <div className="lg:col-span-8 space-y-4">
-          <div className="bg-white dark:bg-[#222327] rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/60 dark:border-white/5 space-y-5">
+          <div className="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/60 space-y-5">
             
             {/* Table Header & Search Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Medicine Catalog</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Search and click medicines to add to dispensing slip</p>
+                <h2 className="text-lg font-bold text-slate-900">Medicine Catalog</h2>
+                <p className="text-xs text-slate-500">Search and click medicines to add to dispensing slip</p>
               </div>
 
               <div className="relative w-full sm:w-72">
@@ -215,7 +215,7 @@ export default function POSPage() {
                   placeholder="Search medicine brand or generic..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#161719] border border-slate-200 dark:border-white/10 rounded-xl text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E60FF]"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E60FF]"
                 />
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function POSPage() {
                   className={`px-3.5 py-2 rounded-xl font-medium transition-all whitespace-nowrap cursor-pointer ${
                     selectedCategory === cat
                       ? 'bg-[#4E60FF] text-white shadow-xs font-semibold'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/5 dark:text-slate-400 dark:hover:text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
                   {cat === 'ALL' ? 'All Medicines' : cat}
@@ -240,7 +240,7 @@ export default function POSPage() {
             {/* Clean Data Table */}
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-100 dark:border-white/5">
+                <thead className="text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-100">
                   <tr>
                     <th className="py-3 px-3">Medicine Name</th>
                     <th className="py-3 px-3">Dosage Form</th>
@@ -250,7 +250,7 @@ export default function POSPage() {
                     <th className="py-3 px-3 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                <tbody className="divide-y divide-slate-100">
                   {filteredProducts.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-10 text-center text-slate-400">
@@ -267,25 +267,25 @@ export default function POSPage() {
                       return (
                         <tr 
                           key={product.id}
-                          className="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                          className="hover:bg-slate-50/70 transition-colors cursor-pointer"
                           onClick={() => handleAddProduct(product)}
                         >
                           <td className="py-3 px-3">
-                            <p className="font-bold text-slate-900 dark:text-white">{product.brandName}</p>
+                            <p className="font-bold text-slate-900">{product.brandName}</p>
                             <p className="text-[10px] text-slate-400">{product.genericName} ({product.strength})</p>
                           </td>
 
-                          <td className="py-3 px-3 text-slate-600 dark:text-slate-300 font-medium">
+                          <td className="py-3 px-3 text-slate-600 font-medium">
                             {product.dosageForm}
                           </td>
 
                           <td className="py-3 px-3 text-center">
                             <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                               totalStock === 0
-                                ? 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-300'
+                                ? 'bg-red-100 text-red-700'
                                 : totalStock <= 15
-                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
-                                : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-emerald-100 text-emerald-800'
                             }`}>
                               {totalStock === 0 ? 'Out of Stock' : `${totalStock} In Stock`}
                             </span>
@@ -301,7 +301,7 @@ export default function POSPage() {
                             )}
                           </td>
 
-                          <td className="py-3 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
+                          <td className="py-3 px-3 text-right font-mono font-bold text-slate-900">
                             GH₵ {product.retailPrice.toFixed(2)}
                           </td>
 
@@ -330,13 +330,13 @@ export default function POSPage() {
 
         {/* Right Column (30% - 4 cols on lg screen - Dispensing Slip) */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-white dark:bg-[#222327] rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/60 dark:border-white/5 flex flex-col justify-between space-y-4 min-h-[500px]">
+          <div className="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/60 flex flex-col justify-between space-y-4 min-h-[500px]">
             
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
                 <ShoppingCart className="w-5 h-5 text-[#4E60FF]" />
-                <h3 className="font-bold text-base text-slate-900 dark:text-white">Dispensing Slip</h3>
+                <h3 className="font-bold text-base text-slate-900">Dispensing Slip</h3>
               </div>
               
               {cart.length > 0 && (
@@ -353,7 +353,7 @@ export default function POSPage() {
             <div className="flex-1 overflow-y-auto max-h-[320px] space-y-2 pr-1">
               {cart.length === 0 ? (
                 <div className="py-16 text-center text-slate-400 space-y-2">
-                  <Package className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600" />
+                  <Package className="w-10 h-10 mx-auto text-slate-300" />
                   <p className="text-xs font-medium">Dispensing slip is empty</p>
                   <p className="text-[10px] text-slate-400">Click medicines from catalog to add</p>
                 </div>
@@ -361,27 +361,27 @@ export default function POSPage() {
                 cart.map(item => (
                   <div
                     key={item.product.id}
-                    className="p-3 bg-slate-50 dark:bg-[#161719] border border-slate-100/80 dark:border-white/5 rounded-xl flex items-center justify-between text-xs"
+                    className="p-3 bg-slate-50 border border-slate-100/80 rounded-xl flex items-center justify-between text-xs"
                   >
                     <div>
-                      <h4 className="font-bold text-slate-900 dark:text-white">{item.product.brandName}</h4>
+                      <h4 className="font-bold text-slate-900">{item.product.brandName}</h4>
                       <p className="text-[10px] text-slate-400 font-mono">
-                        GH₵ {item.unitPrice.toFixed(2)} x {item.quantity} = <b className="text-slate-900 dark:text-white">GH₵ {item.lineTotal.toFixed(2)}</b>
+                        GH₵ {item.unitPrice.toFixed(2)} x {item.quantity} = <b className="text-slate-900">GH₵ {item.lineTotal.toFixed(2)}</b>
                       </p>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-1 bg-white dark:bg-[#222327] border border-slate-200 dark:border-white/10 rounded-lg p-0.5">
+                      <div className="flex items-center space-x-1 bg-white border border-slate-200 rounded-lg p-0.5">
                         <button
                           onClick={() => updateCartItemQty(item.product.id, item.quantity - 1)}
-                          className="p-1 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 rounded cursor-pointer"
+                          className="p-1 text-slate-600 hover:bg-slate-100 rounded cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="px-1.5 font-bold font-mono text-slate-900 dark:text-white">{item.quantity}</span>
+                        <span className="px-1.5 font-bold font-mono text-slate-900">{item.quantity}</span>
                         <button
                           onClick={() => updateCartItemQty(item.product.id, item.quantity + 1)}
-                          className="p-1 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 rounded cursor-pointer"
+                          className="p-1 text-slate-600 hover:bg-slate-100 rounded cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -400,14 +400,14 @@ export default function POSPage() {
             </div>
 
             {/* Totals & Checkout Button */}
-            <div className="border-t border-slate-100 dark:border-white/5 pt-4 space-y-3">
-              <div className="bg-slate-50 dark:bg-[#161719] p-3.5 rounded-xl space-y-1.5 text-xs border border-slate-100/80 dark:border-white/5">
-                <div className="flex justify-between text-slate-600 dark:text-slate-400">
+            <div className="border-t border-slate-100 pt-4 space-y-3">
+              <div className="bg-slate-50 p-3.5 rounded-xl space-y-1.5 text-xs border border-slate-100/80">
+                <div className="flex justify-between text-slate-600">
                   <span>Subtotal:</span>
-                  <span className="font-semibold tabular-nums text-slate-900 dark:text-white">GH₵ {cartSubtotal.toFixed(2)}</span>
+                  <span className="font-semibold tabular-nums text-slate-900">GH₵ {cartSubtotal.toFixed(2)}</span>
                 </div>
 
-                <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
+                <div className="flex justify-between items-center text-slate-600">
                   <span>Discount (GH₵):</span>
                   <input
                     type="number"
@@ -415,11 +415,11 @@ export default function POSPage() {
                     value={cartDiscount || ''}
                     onChange={(e) => setCartDiscount(parseFloat(e.target.value) || 0)}
                     placeholder="0.00"
-                    className="w-20 p-1 bg-white dark:bg-[#222327] border border-slate-200 dark:border-white/10 rounded text-right text-xs font-bold text-slate-900 dark:text-white"
+                    className="w-20 p-1 bg-white border border-slate-200 rounded text-right text-xs font-bold text-slate-900"
                   />
                 </div>
 
-                <div className="flex justify-between items-center text-base font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-white/10">
+                <div className="flex justify-between items-center text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
                   <span>NET TOTAL DUE:</span>
                   <span className="text-xl text-[#4E60FF] tabular-nums font-bold">GH₵ {cartTotal.toFixed(2)}</span>
                 </div>

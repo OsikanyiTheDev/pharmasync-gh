@@ -168,22 +168,22 @@ export default function BulkStockImportPage() {
   const invalidCount = parsedRows.filter(r => !r.isValid).length;
 
   return (
-    <div className="space-y-6 text-slate-900 dark:text-white pb-16">
+    <div className="space-y-6 text-slate-900 pb-16">
       
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-100/60 p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <div className="flex items-center space-x-3">
-          <Link href="/inventory" className="p-2 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 rounded-xl transition-all">
+          <Link href="/inventory" className="p-2 bg-[#F3F4F7] border border-slate-100 hover:bg-slate-50 text-slate-700 rounded-xl transition-all">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
             <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white">Bulk Stock CSV Importer</h1>
+              <h1 className="text-xl font-bold text-slate-900">Bulk Stock CSV Importer</h1>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#4E60FF]/10 text-[#4E60FF] border border-[#4E60FF]/20">Quick Onboarding</span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Onboard legacy pharmacy inventory with automated validation</p>
+            <p className="text-xs text-slate-500">Onboard legacy pharmacy inventory with automated validation</p>
           </div>
         </div>
-        <button onClick={handleDownloadTemplate} className="flex items-center space-x-2 px-4 py-2.5 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 text-[#4E60FF] font-bold text-xs rounded-xl transition-all">
+        <button onClick={handleDownloadTemplate} className="flex items-center space-x-2 px-4 py-2.5 bg-[#F3F4F7] border border-slate-100 hover:bg-slate-50 text-[#4E60FF] font-bold text-xs rounded-xl transition-all">
           <Download className="w-4 h-4" />
           <span>Download Sample Template (.CSV)</span>
         </button>
@@ -193,15 +193,15 @@ export default function BulkStockImportPage() {
         onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
         className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${
-          dragActive ? 'border-[#4E60FF] bg-[#4E60FF]/5' : 'border-slate-200 dark:border-white/10 bg-white dark:bg-[#222327] hover:border-[#4E60FF]/50'
+          dragActive ? 'border-[#4E60FF] bg-[#4E60FF]/5' : 'border-slate-200 bg-white hover:border-[#4E60FF]/50'
         }`}
       >
         <input ref={fileInputRef} type="file" accept=".csv,.xlsx" onChange={handleFileChange} className="hidden" />
         <div className="w-12 h-12 bg-[#4E60FF]/10 text-[#4E60FF] rounded-full flex items-center justify-center mx-auto border border-[#4E60FF]/20 mb-3">
           <UploadCloud className="w-6 h-6" />
         </div>
-        <h3 className="text-base font-bold text-slate-900 dark:text-white">{fileName ? `File Selected: ${fileName}` : 'Drag & Drop CSV / Excel Stock File Here'}</h3>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">Supports <code className="font-mono text-[#4E60FF] font-bold">.csv</code> files up to 5,000 items. Automatic validation.</p>
+        <h3 className="text-base font-bold text-slate-900">{fileName ? `File Selected: ${fileName}` : 'Drag & Drop CSV / Excel Stock File Here'}</h3>
+        <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">Supports <code className="font-mono text-[#4E60FF] font-bold">.csv</code> files up to 5,000 items. Automatic validation.</p>
         <div className="mt-4 inline-flex items-center space-x-2 text-xs font-bold text-[#4E60FF] bg-[#4E60FF]/10 px-3 py-1.5 rounded-xl border border-[#4E60FF]/20">
           <FileSpreadsheet className="w-4 h-4" />
           <span>Click to Browse Computer</span>
@@ -213,8 +213,8 @@ export default function BulkStockImportPage() {
           <div className="flex items-center space-x-3">
             <div className="bg-[#10B981] text-white p-2 rounded-full"><CheckCircle2 className="w-5 h-5" /></div>
             <div>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white">Bulk Stock Ingestion Complete!</h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400">Successfully created {importSuccessCount} stock records.</p>
+              <h4 className="font-bold text-sm text-slate-900">Bulk Stock Ingestion Complete!</h4>
+              <p className="text-xs text-slate-600">Successfully created {importSuccessCount} stock records.</p>
             </div>
           </div>
           <Link href="/inventory" className="px-4 py-2 bg-[#10B981] text-white font-bold text-xs rounded-xl shadow-sm hover:bg-emerald-600">View Inventory</Link>
@@ -222,35 +222,35 @@ export default function BulkStockImportPage() {
       )}
 
       {parsedRows.length > 0 && (
-        <div className="bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 p-6 rounded-2xl space-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-4">
+        <div className="bg-white border border-slate-100/60 p-6 rounded-2xl space-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div className="flex items-center space-x-3 text-xs font-bold">
-              <span className="flex items-center text-slate-700 dark:text-slate-300"><FileCheck className="w-4 h-4 mr-1 text-[#4E60FF]" /> Total Rows: <b className="ml-1 text-slate-900 dark:text-white font-mono tabular-nums">{parsedRows.length}</b></span>
+              <span className="flex items-center text-slate-700"><FileCheck className="w-4 h-4 mr-1 text-[#4E60FF]" /> Total Rows: <b className="ml-1 text-slate-900 font-mono tabular-nums">{parsedRows.length}</b></span>
               <span className="flex items-center text-[#10B981] bg-[#10B981]/10 px-2.5 py-1 rounded-full border border-[#10B981]/20">Valid: {validCount}</span>
               {invalidCount > 0 && <span className="flex items-center text-[#EF4444] bg-[#EF4444]/10 px-2.5 py-1 rounded-full border border-[#EF4444]/20">Errors: {invalidCount}</span>}
             </div>
-            <button disabled={validCount === 0 || isSubmitting} onClick={handleBulkUpsert} className="flex items-center justify-center space-x-2 px-6 py-2.5 bg-[#4E60FF] hover:bg-[#3D4FE6] disabled:bg-slate-200 dark:disabled:bg-white/10 text-white font-bold text-xs rounded-xl shadow-sm transition-all">
+            <button disabled={validCount === 0 || isSubmitting} onClick={handleBulkUpsert} className="flex items-center justify-center space-x-2 px-6 py-2.5 bg-[#4E60FF] hover:bg-[#3D4FE6] disabled:bg-slate-200 text-white font-bold text-xs rounded-xl shadow-sm transition-all">
               {isSubmitting ? <><RefreshCw className="w-4 h-4 animate-spin" /><span>Processing...</span></> : <><Sparkles className="w-4 h-4" /><span>1-Click Bulk Upsert ({validCount} Items)</span></>}
             </button>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-white/5">
+          <div className="overflow-x-auto rounded-xl border border-slate-100">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F3F4F7] dark:bg-[#161719] text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-100 dark:border-white/5 uppercase tracking-wider">
+              <thead className="bg-[#F3F4F7] text-slate-500 font-semibold border-b border-slate-100 uppercase tracking-wider">
                 <tr><th className="py-3 px-3">Row</th><th className="py-3 px-3">Status</th><th className="py-3 px-3">Brand Name</th><th className="py-3 px-3">Batch No</th><th className="py-3 px-3">Expiry</th><th className="py-3 px-3 text-right">Qty</th><th className="py-3 px-3 text-right">Cost (GH₵)</th><th className="py-3 px-3 text-right">Sell (GH₵)</th><th className="py-3 px-3">Branch</th><th className="py-3 px-3">Errors</th></tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-white/5 bg-white dark:bg-[#222327]">
+              <tbody className="divide-y divide-slate-100 bg-white">
                 {parsedRows.map((row) => (
-                  <tr key={row.rowNumber} className={`${!row.isValid ? 'bg-[#EF4444]/5' : 'hover:bg-slate-50 dark:hover:bg-white/5'} transition-colors`}>
+                  <tr key={row.rowNumber} className={`${!row.isValid ? 'bg-[#EF4444]/5' : 'hover:bg-slate-50'} transition-colors`}>
                     <td className="py-2.5 px-3 font-mono text-slate-500 font-bold">#{row.rowNumber}</td>
                     <td className="py-2.5 px-3">{row.isValid ? <span className="px-2 py-0.5 bg-[#10B981]/10 text-[#10B981] rounded-full font-bold text-[10px] flex items-center w-fit border border-[#10B981]/20"><CheckCircle2 className="w-3 h-3 mr-1" />Validated</span> : <span className="px-2 py-0.5 bg-[#EF4444]/10 text-[#EF4444] rounded-full font-bold text-[10px] flex items-center w-fit border border-[#EF4444]/20"><AlertTriangle className="w-3 h-3 mr-1" />Invalid</span>}</td>
-                    <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-white">{row.brandName || '—'}</td>
+                    <td className="py-2.5 px-3 font-bold text-slate-900">{row.brandName || '—'}</td>
                     <td className="py-2.5 px-3 font-mono font-bold text-[#4E60FF]">{row.batchNumber || '—'}</td>
                     <td className="py-2.5 px-3 font-mono text-xs">{row.expiryDate || '—'}</td>
                     <td className="py-2.5 px-3 text-right font-mono font-bold tabular-nums">{row.quantity}</td>
                     <td className="py-2.5 px-3 text-right font-mono tabular-nums">GH₵ {row.costPrice.toFixed(2)}</td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white tabular-nums">GH₵ {row.sellingPrice.toFixed(2)}</td>
-                    <td className="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">{row.branchName || '—'}</td>
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 tabular-nums">GH₵ {row.sellingPrice.toFixed(2)}</td>
+                    <td className="py-2.5 px-3 font-medium text-slate-700">{row.branchName || '—'}</td>
                     <td className="py-2.5 px-3 text-[#EF4444] font-medium">{row.errors.length > 0 ? row.errors.join(' • ') : <span className="text-slate-400">—</span>}</td>
                   </tr>
                 ))}

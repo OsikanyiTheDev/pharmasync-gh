@@ -44,10 +44,10 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             key={t.id}
             className={`pointer-events-auto flex items-start space-x-3 p-3.5 rounded-2xl border shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-md transition-all animate-in slide-in-from-bottom-5 duration-200 ${
               t.type === 'success'
-                ? 'bg-white dark:bg-[#222327] border-[#10B981]/20 text-slate-900 dark:text-white'
+                ? 'bg-white border-[#10B981]/20 text-slate-900'
                 : t.type === 'error'
-                ? 'bg-white dark:bg-[#222327] border-[#EF4444]/20 text-slate-900 dark:text-white'
-                : 'bg-white dark:bg-[#222327] border-[#4E60FF]/20 text-slate-900 dark:text-white'
+                ? 'bg-white border-[#EF4444]/20 text-slate-900'
+                : 'bg-white border-[#4E60FF]/20 text-slate-900'
             }`}
           >
             {t.type === 'success' && <div className="bg-[#10B981] text-white p-1 rounded-full flex-shrink-0"><CheckCircle2 className="w-4 h-4" /></div>}
@@ -55,11 +55,11 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             {t.type === 'info' && <div className="bg-[#4E60FF] text-white p-1 rounded-full flex-shrink-0"><Info className="w-4 h-4" /></div>}
 
             <div className="flex-1">
-              <p className="text-xs font-bold text-slate-900 dark:text-white">{t.message}</p>
-              {t.description && <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{t.description}</p>}
+              <p className="text-xs font-bold text-slate-900">{t.message}</p>
+              {t.description && <p className="text-[11px] text-slate-500 mt-0.5">{t.description}</p>}
             </div>
 
-            <button onClick={() => removeToast(t.id)} className="text-slate-400 hover:text-slate-700 dark:hover:text-white p-0.5 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5">
+            <button onClick={() => removeToast(t.id)} className="text-slate-400 hover:text-slate-700 p-0.5 rounded-lg hover:bg-slate-50">
               <X className="w-4 h-4" />
             </button>
           </div>

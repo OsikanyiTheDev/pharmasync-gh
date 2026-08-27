@@ -17,14 +17,14 @@ export const RecentSalesDrawer: React.FC<RecentSalesDrawerProps> = ({ onSelectSa
   const branchSales = sales.filter(s => s.branchId === activeBranchId);
 
   return (
-    <div className="bg-white dark:bg-[#222327] rounded-2xl border border-slate-100/80 dark:border-white/5 p-5 text-slate-900 dark:text-white shadow-sm space-y-3">
-      <div className="flex items-center space-x-2 border-b border-slate-100 dark:border-white/5 pb-3">
+    <div className="bg-white rounded-2xl border border-slate-100/80 p-5 text-slate-900 shadow-sm space-y-3">
+      <div className="flex items-center space-x-2 border-b border-slate-100 pb-3">
         <div className="p-2 bg-[#4E60FF]/10 text-[#4E60FF] rounded-xl border border-[#4E60FF]/20">
           <History className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-bold text-sm text-slate-900 dark:text-white">Recent Branch Receipts</h3>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Click to view printable receipt or share via WhatsApp</p>
+          <h3 className="font-bold text-sm text-slate-900">Recent Branch Receipts</h3>
+          <p className="text-[11px] text-slate-500 font-medium">Click to view printable receipt or share via WhatsApp</p>
         </div>
       </div>
 
@@ -36,7 +36,7 @@ export const RecentSalesDrawer: React.FC<RecentSalesDrawerProps> = ({ onSelectSa
             <div
               key={sale.id}
               onClick={() => onSelectSale(sale)}
-              className="p-3 bg-slate-50 dark:bg-[#161719] hover:bg-slate-100/80 dark:hover:bg-white/5 border border-slate-100/80 dark:border-white/5 rounded-xl cursor-pointer transition-all flex items-center justify-between group"
+              className="p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-100/80 rounded-xl cursor-pointer transition-all flex items-center justify-between group"
             >
               <div>
                 <div className="flex items-center space-x-2">
@@ -46,13 +46,13 @@ export const RecentSalesDrawer: React.FC<RecentSalesDrawerProps> = ({ onSelectSa
                     {formatReceiptDate(sale.timestamp)}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
-                  {sale.items.length} item(s) • <span className="font-bold text-slate-900 dark:text-white">{formatGHSCurrency(sale.total)}</span>
+                <p className="text-[11px] text-slate-600 mt-0.5">
+                  {sale.items.length} item(s) • <span className="font-bold text-slate-900">{formatGHSCurrency(sale.total)}</span>
                 </p>
               </div>
 
               <div className="flex items-center space-x-1.5">
-                <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 bg-slate-200/60 dark:bg-white/5 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-semibold text-slate-600 bg-slate-200/60 px-2 py-0.5 rounded">
                   {sale.payment.method}
                 </span>
                 <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#4E60FF] transition-colors" />

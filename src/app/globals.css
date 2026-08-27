@@ -8,16 +8,9 @@
     --text-secondary: #64748B;
     --accent-blue: #4E60FF;
   }
-  .dark {
-    --bg-app: #161719;
-    --bg-card: #222327;
-    --text-primary: #FFFFFF;
-    --text-secondary: #94A3B8;
-    --accent-blue: #4E60FF;
-  }
   body {
-    background-color: var(--bg-app);
-    color: var(--text-primary);
+    background-color: #F3F4F7;
+    color: #0F172A;
     min-height: 100vh;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -37,16 +30,13 @@
   }
 }
 
-/* Custom scrollbars - subtle clinical */
+/* Custom scrollbars - light only */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #F3F4F7;
-}
-.dark ::-webkit-scrollbar-track {
-  background: #161719;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.4);
@@ -62,7 +52,7 @@
     background-color: white !important;
     color: black !important;
   }
-  aside, header, nav, button, .no-print, [role=\"dialog\"] > *:not(#printable-receipt) {
+  aside, header, nav, button, .no-print, [role="dialog"] > *:not(#printable-receipt) {
     display: none !important;
   }
   #printable-receipt {
