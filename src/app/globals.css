@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-app: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-surface-alt: #f1f5f9;
+    --border-color: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --accent-teal: #0f766e;
+    --accent-teal-hover: #0d9488;
+  }
+
+  .dark {
+    --bg-app: #090d16;
+    --bg-card: #131b2e;
+    --bg-surface-alt: #0b0f19;
+    --border-color: #1e293b;
+    --border-hover: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-teal: #14b8a6;
+    --accent-teal-hover: #2dd4bf;
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    @apply antialiased font-sans selection:bg-teal-600 selection:text-white transition-colors duration-200;
+  }
+
+  html.dark body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+  }
+
+  /* Universal Surface Overrides for Clinical Obsidian Dark Mode */
+  html.dark .bg-white {
+    background-color: #131b2e !important;
+    color: #f8fafc !important;
+    border-color: #1e293b !important;
+  }
+
+  html.dark .bg-slate-50 {
+    background-color: #0b0f19 !important;
+    color: #f1f5f9 !important;
+    border-color: #1e293b !important;
+  }
+
+  html.dark .bg-slate-100 {
+    background-color: #131b2e !important;
+    color: #e2e8f0 !important;
+    border-color: #1e293b !important;
+  }
+
+  html.dark .bg-slate-900 {
+    background-color: #0b0f19 !important;
+    border-color: #1e293b !important;
+  }
+
+  html.dark .text-slate-900 {
+    color: #f8fafc !important;
+  }
+
+  html.dark .text-slate-800 {
+    color: #e2e8f0 !important;
+  }
+
+  html.dark .text-slate-700 {
+    color: #cbd5e1 !important;
+  }
+
+  html.dark .text-slate-600 {
+    color: #94a3b8 !important;
+  }
+
+  html.dark .text-slate-500 {
+    color: #64748b !important;
+  }
+
+  html.dark .border-slate-200 {
+    border-color: #1e293b !important;
+  }
+
+  html.dark .border-slate-300 {
+    border-color: #334155 !important;
+  }
+
+  /* Clinical Status Badges in Dark Mode */
+  html.dark .bg-emerald-100,
+  html.dark .bg-emerald-50 {
+    background-color: rgba(6, 78, 59, 0.6) !important;
+    color: #6ee7b7 !important;
+    border-color: #065f46 !important;
+  }
+
+  html.dark .bg-amber-100,
+  html.dark .bg-amber-50 {
+    background-color: rgba(120, 53, 15, 0.6) !important;
+    color: #fcd34d !important;
+    border-color: #92400e !important;
+  }
+
+  html.dark .bg-red-100,
+  html.dark .bg-red-50,
+  html.dark .bg-rose-100,
+  html.dark .bg-rose-50 {
+    background-color: rgba(136, 19, 55, 0.6) !important;
+    color: #fda4af !important;
+    border-color: #9f1239 !important;
+  }
+
+  html.dark .bg-indigo-100,
+  html.dark .bg-indigo-50 {
+    background-color: rgba(49, 46, 129, 0.6) !important;
+    color: #a5b4fc !important;
+    border-color: #3730a3 !important;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbars for high-density tables & search drawers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.8);
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: rgba(9, 13, 22, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.8);
+}
+
+/* Printable layout styling for clean A4/A5 desktop office printer support */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  aside, 
+  header, 
+  nav, 
+  button, 
+  .no-print,
+  [role="dialog"] > *:not(#printable-receipt) {
+    display: none !important;
+  }
+
+  #printable-receipt {
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    color: black !important;
+  }
+}
