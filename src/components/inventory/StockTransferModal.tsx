@@ -34,10 +34,10 @@ export const StockTransferModal: React.FC<StockTransferModalProps> = ({ isOpen, 
   const sourceBranchName = branches.find(b => b.id === sourceBranch)?.name || sourceBranch;
   const destBranchName = branches.find(b => b.id === destinationBranch)?.name || destinationBranch;
 
-  const handleCreateTransfer = () => {
+  const handleCreateTransfer = async () => {
     if (!activeSelectedBatch || quantity <= 0) return;
 
-    const newTransfer = createTransfer(
+    const newTransfer = await createTransfer(
       sourceBranch,
       destinationBranch,
       [
@@ -50,7 +50,7 @@ export const StockTransferModal: React.FC<StockTransferModalProps> = ({ isOpen, 
       notes || 'Inter-branch stock re-balancing'
     );
 
-    dispatchTransfer(newTransfer.id);
+    await dispatchTransfer(newTransfer.id);
     setSuccessTransferNo(newTransfer.transferNo);
     showToast(`Stock transfer dispatched to ${destBranchName}`, 'success', `Ref: ${newTransfer.transferNo}`);
   };

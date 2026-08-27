@@ -44,7 +44,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
   const cashChange = Math.max(0, cashTendered - cartTotal);
 
-  const handleConfirmCheckout = () => {
+  const handleConfirmCheckout = async () => {
     const paymentData: PaymentDetails = {
       method: paymentMethod,
       customerName,
@@ -66,7 +66,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       paymentData.momoRef = momoRef;
     }
 
-    const sale = processCheckout(paymentData);
+    const sale = await processCheckout(paymentData);
     if (sale) {
       // Trigger celebrate confetti
       try {
