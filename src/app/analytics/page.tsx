@@ -4,15 +4,11 @@ import React, { useState } from 'react';
 import { usePharmacy } from '../../context/PharmacyContext';
 import { 
   TrendingUp, 
-  DollarSign, 
   CreditCard, 
   Building2, 
-  Award, 
   Flame, 
   Turtle, 
   BarChart3, 
-  PieChart, 
-  Calendar,
   Layers,
   Banknote,
   Percent,
@@ -20,9 +16,41 @@ import {
 } from 'lucide-react';
 import { BranchId } from '../../lib/types';
 
+// Helper for safe number conversion
+const safeNum = (val: any) => (isNaN(Number(val)) || val === null || val === undefined ? 0 : Number(val));
+
 export default function AnalyticsPage() {
-  const { sales, products, branches } = usePharmacy();
+  const { sales, products, branches, isLoading } = usePharmacy();
   const [timeFilter, setTimeFilter] = useState<'TODAY' | 'WEEK' | 'MONTH' | 'ALL'>('ALL');
+
+  // Skeleton Loading State (Zero Flicker)
+  if (isLoading) {
+    return (
+      <div className="space-y-6 text-slate-900 dark:text-slate-100 pb-12">
+        {/* Skeleton Header */}
+        <div className="h-20 bg-slate-200 dark:bg-slate-800/80 rounded-2xl animate-pulse" />
+
+        {/* Skeleton Metric Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-28 bg-slate-200 dark:bg-slate-800/80 rounded-2xl animate-pulse" />
+          ))}
+        </div>
+
+        {/* Skeleton Breakdown Grids */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="lg:col-span-6 h-64 bg-slate-200 dark:bg-slate-800/80 rounded-2xl animate-pulse" />
+          <div className="lg:col-span-6 h-64 bg-slate-200 dark:bg-slate-800/80 rounded-2xl animate-pulse" />
+        </div>
+
+        {/* Skeleton Velocity Tables */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="h-64 bg-slate-200 dark:bg-slate-800/80 rounded-2xl animate-pulse" />
+          <div className="h-64 bg-slate-200 dark:bg-slate-800/80 rounded-2xl animate-pulse" />
+        </div>
+      </div>
+    );
+  }
 
   // Filter sales by time
   const now = new Date().getTime();
@@ -36,15 +64,23 @@ export default function AnalyticsPage() {
     return true;
   });
 
-  // Calculate Key Metrics
-  const totalRevenue = filteredSales.reduce((acc, s) => acc + s.total, 0);
+  // Calculate Key Metrics with safeNum
+  const totalRevenue = filteredSales.reduce((acc, s) => acc + safeNum(s.total), 0);
 
-  // Calculate COGS
+  // Calculate COGS using fallback resolution
   const totalCOGS = filteredSales.reduce((acc, s) => {
-    return acc + s.items.reduce((itemAcc, item) => itemAcc + (item.product.costPrice * item.quantity), 0);
+    return (
+      acc +
+      (s.items || []).reduce((itemAcc, item) => {
+        const catalogProd = products.find(p => p.id === item.product?.id);
+        const costPrice = safeNum(item.product?.costPrice ?? catalogProd?.costPrice);
+        const qty = safeNum(item.quantity);
+        return itemAcc + costPrice * qty;
+      }, 0)
+    );
   }, 0);
 
-  const grossProfit = totalRevenue - totalCOGS;
+  const grossProfit = Math.max(0, totalRevenue - totalCOGS);
   const marginPercent = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
   const avgBasketValue = filteredSales.length > 0 ? totalRevenue / filteredSales.length : 0;
 
@@ -54,19 +90,20 @@ export default function AnalyticsPage() {
   let momoTelecelRevenue = 0;
 
   filteredSales.forEach(s => {
+    const saleTot = safeNum(s.total);
     if (s.payment.method === 'CASH') {
-      cashRevenue += s.total;
+      cashRevenue += saleTot;
     } else if (s.payment.method === 'SPLIT') {
-      cashRevenue += (s.payment.cashPaid || 0);
+      cashRevenue += safeNum(s.payment.cashPaid);
       if (s.payment.momoProvider === 'Telecel Cash') {
-        momoTelecelRevenue += (s.payment.momoAmount || 0);
+        momoTelecelRevenue += safeNum(s.payment.momoAmount);
       } else {
-        momoMTNRevenue += (s.payment.momoAmount || 0);
+        momoMTNRevenue += safeNum(s.payment.momoAmount);
       }
-    } else if (s.payment.momoProvider === 'Telecel Cash') {
-      momoTelecelRevenue += s.total;
+    } else if (s.payment.momoProvider === 'Telecel Cash' || s.payment.method === 'MOMO_TELECEL') {
+      momoTelecelRevenue += saleTot;
     } else {
-      momoMTNRevenue += s.total;
+      momoMTNRevenue += saleTot;
     }
   });
 
@@ -79,7 +116,7 @@ export default function AnalyticsPage() {
 
   filteredSales.forEach(s => {
     if (branchRevenue[s.branchId] !== undefined) {
-      branchRevenue[s.branchId] += s.total;
+      branchRevenue[s.branchId] += safeNum(s.total);
     }
   });
 
@@ -91,10 +128,11 @@ export default function AnalyticsPage() {
   });
 
   filteredSales.forEach(s => {
-    s.items.forEach(item => {
-      if (productStatsMap[item.product.id]) {
-        productStatsMap[item.product.id].totalQty += item.quantity;
-        productStatsMap[item.product.id].totalRevenue += item.lineTotal;
+    (s.items || []).forEach(item => {
+      const pId = item.product?.id;
+      if (pId && productStatsMap[pId]) {
+        productStatsMap[pId].totalQty += safeNum(item.quantity);
+        productStatsMap[pId].totalRevenue += safeNum(item.lineTotal);
       }
     });
   });
@@ -170,7 +208,7 @@ export default function AnalyticsPage() {
           </div>
           <p className="text-2xl font-black text-teal-950 dark:text-teal-100 tabular-nums">GH₵ {grossProfit.toFixed(2)}</p>
           <div className="w-full bg-teal-200 dark:bg-teal-900 h-1.5 rounded-full overflow-hidden">
-            <div className="bg-teal-700 dark:bg-teal-400 h-full rounded-full" style={{ width: `${marginPercent}%` }} />
+            <div className="bg-teal-700 dark:bg-teal-400 h-full rounded-full" style={{ width: `${Math.min(100, marginPercent)}%` }} />
           </div>
           <p className="text-[11px] text-teal-800 dark:text-teal-300 font-extrabold">{marginPercent.toFixed(1)}% Profit Margin</p>
         </div>

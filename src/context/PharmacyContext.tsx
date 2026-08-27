@@ -19,7 +19,6 @@ import {
   INITIAL_PRODUCTS,
   INITIAL_BATCHES,
   INITIAL_TRANSFERS,
-  INITIAL_SALES,
 } from '../lib/seed-data';
 import { autoSelectFEFOBatch } from '../lib/fefo';
 import { StorageEngine } from '../lib/db';
@@ -38,6 +37,9 @@ const UUID_TO_BRANCH_CODE: Record<string, BranchId> = {
 };
 
 interface PharmacyContextType {
+  // Loading State
+  isLoading: boolean;
+
   // Branches
   branches: Branch[];
   activeBranchId: BranchId;
@@ -93,6 +95,7 @@ interface PharmacyContextType {
 const PharmacyContext = createContext<PharmacyContextType | undefined>(undefined);
 
 export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [branches, setBranches] = useState<Branch[]>(INITIAL_BRANCHES);
   const [activeBranchId, setActiveBranchId] = useState<BranchId>('ACCRA_MAIN');
 
@@ -104,8 +107,8 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [patientDetails, setPatientDetails] = useState({ name: '', phone: '', doctor: '', rxNumber: '' });
 
   const [heldBills, setHeldBills] = useState<HeldBill[]>([]);
-  const [sales, setSales] = useState<Sale[]>(INITIAL_SALES);
-  const [lastCompletedSale, setLastCompletedSale] = useState<Sale | null>(INITIAL_SALES[0] || null);
+  const [sales, setSales] = useState<Sale[]>([]);
+  const [lastCompletedSale, setLastCompletedSale] = useState<Sale | null>(null);
 
   const [transfers, setTransfers] = useState<InterBranchTransfer[]>(INITIAL_TRANSFERS);
   const [adjustments, setAdjustments] = useState<StockAdjustment[]>([]);
@@ -130,8 +133,9 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       // 2. Fetch Medicines catalog
       const { data: medsData } = await supabase.from('medicines').select('*');
+      let currentProducts = products;
       if (medsData && medsData.length > 0) {
-        const mappedProducts: Product[] = medsData.map(m => ({
+        currentProducts = medsData.map(m => ({
           id: m.id,
           brandName: m.brand_name,
           genericName: m.generic_name,
@@ -145,7 +149,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           requiresPrescription: !!m.requires_prescription,
           nafdacOrFdaNo: m.nafdac_fda_no,
         }));
-        setProducts(mappedProducts);
+        setProducts(currentProducts);
       }
 
       // 3. Fetch Branch Stock
@@ -168,7 +172,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setBatches(mappedBatches);
       }
 
-      // 4. Fetch Sales Ledger
+      // 4. Fetch Sales Ledger (with cost price fallback resolution)
       const { data: salesData } = await supabase
         .from('sales')
         .select('*, sale_items(*)')
@@ -179,21 +183,36 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const bCode = UUID_TO_BRANCH_CODE[s.branch_id] || 'ACCRA_MAIN';
           return {
             id: s.id,
-            receiptNumber: s.invoice_number,
+            receiptNumber: s.invoice_number || `INV-${s.id}`,
             branchId: bCode,
             timestamp: s.created_at,
-            items: (s.sale_items || []).map((si: any) => ({
-              product: {
-                id: si.medicine_id,
-                brandName: 'Medicine Item',
-                retailPrice: Number(si.unit_price),
-              } as any,
-              selectedBatch: { id: si.branch_stock_id || 'batch-id', batchNumber: 'BATCH' } as any,
-              quantity: si.quantity,
-              unitPrice: Number(si.unit_price),
-              discount: Number(si.discount || 0),
-              lineTotal: Number(si.subtotal),
-            })),
+            items: (s.sale_items || []).map((si: any) => {
+              const catalogProd = currentProducts.find(p => p.id === si.medicine_id);
+              const costPrice = Number(si.unit_cost_price ?? catalogProd?.costPrice ?? 0);
+              const retailPrice = Number(si.unit_price ?? catalogProd?.retailPrice ?? 0);
+              const brandName = catalogProd?.brandName || 'Medicine Item';
+
+              return {
+                product: {
+                  id: si.medicine_id,
+                  brandName,
+                  genericName: catalogProd?.genericName || '',
+                  category: catalogProd?.category || 'OTC & General Wellness',
+                  dosageForm: catalogProd?.dosageForm || 'Tablets',
+                  strength: catalogProd?.strength || '',
+                  packSize: catalogProd?.packSize || '1 Unit',
+                  retailPrice,
+                  costPrice,
+                  reorderLevel: catalogProd?.reorderLevel || 10,
+                  requiresPrescription: catalogProd?.requiresPrescription || false,
+                },
+                selectedBatch: { id: si.branch_stock_id || 'batch-id', batchNumber: 'BATCH' } as any,
+                quantity: Number(si.quantity || 0),
+                unitPrice: retailPrice,
+                discount: Number(si.discount || 0),
+                lineTotal: Number(si.subtotal || (retailPrice * (si.quantity || 0))),
+              };
+            }),
             subtotal: Number(s.subtotal || s.total_amount),
             discount: Number(s.discount || 0),
             tax: Number(s.tax || 0),
@@ -204,6 +223,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               customerPhone: s.customer_phone,
               prescribingDoctor: s.doctor_name,
               rxNumber: s.rx_number,
+              momoProvider: s.payment_method?.includes('TELECEL') ? 'Telecel Cash' : 'MTN Mobile Money',
             },
             attendantName: s.attendant_name || 'Pharmacist',
             synced: true,
@@ -211,6 +231,8 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         });
         setSales(mappedSales);
         if (mappedSales.length > 0) setLastCompletedSale(mappedSales[0]);
+      } else {
+        setSales([]);
       }
 
       // 5. Fetch Transfers
@@ -242,6 +264,8 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     } catch (err) {
       console.error('Error syncing live Supabase data:', err);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -414,6 +438,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             medicine_id: ci.product.id,
             quantity: ci.quantity,
             unit_price: ci.unitPrice,
+            unit_cost_price: ci.product.costPrice,
             discount: ci.discount || 0,
           })),
         }),
@@ -451,6 +476,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             medicine_id: ci.product.id,
             quantity: ci.quantity,
             unit_price: ci.unitPrice,
+            unit_cost_price: ci.product.costPrice,
             discount: ci.discount || 0,
             subtotal: ci.lineTotal,
           }));
@@ -640,6 +666,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   return (
     <PharmacyContext.Provider
       value={{
+        isLoading,
         branches,
         activeBranchId,
         setActiveBranchId,
