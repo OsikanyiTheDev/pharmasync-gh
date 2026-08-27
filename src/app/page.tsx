@@ -41,7 +41,7 @@ export default function POSPage() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-[#F3F4F7] dark:bg-[#161719] min-h-screen">
       
       {/* Top Banner Notice */}
       <div className="bg-white dark:bg-[#222327] rounded-2xl p-4 shadow-sm border border-slate-100/80 dark:border-white/5 flex flex-wrap items-center justify-between text-slate-900 dark:text-slate-100 gap-2">

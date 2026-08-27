@@ -4,7 +4,7 @@
   :root {
     --bg-app: #F3F4F7;
     --bg-card: #FFFFFF;
-    --border-color: rgba(241, 245, 249, 0.8);
+    --border-color: rgba(226, 232, 240, 0.8);
     --text-primary: #0F172A;
     --text-secondary: #64748B;
     --accent-blue: #4E60FF;
@@ -22,64 +22,7 @@
   body {
     background-color: var(--bg-app);
     color: var(--text-primary);
-    @apply antialiased font-sans selection:bg-[#4E60FF] selection:text-white transition-colors duration-200;
-  }
-
-  html.dark body {
-    background-color: #161719;
-    color: #FFFFFF;
-  }
-
-  /* Universal Dark Mode Surface Overrides for Matte Graphite (#222327) */
-  html.dark .bg-white {
-    background-color: #222327 !important;
-    color: #FFFFFF !important;
-    border-color: rgba(255, 255, 255, 0.05) !important;
-  }
-
-  html.dark .bg-slate-50 {
-    background-color: #161719 !important;
-    color: #F1F5F9 !important;
-    border-color: rgba(255, 255, 255, 0.05) !important;
-  }
-
-  html.dark .bg-slate-100 {
-    background-color: #2A2C31 !important;
-    color: #E2E8F0 !important;
-    border-color: rgba(255, 255, 255, 0.05) !important;
-  }
-
-  html.dark .bg-slate-900 {
-    background-color: #121315 !important;
-    border-color: rgba(255, 255, 255, 0.05) !important;
-  }
-
-  html.dark .text-slate-900 {
-    color: #FFFFFF !important;
-  }
-
-  html.dark .text-slate-800 {
-    color: #E2E8F0 !important;
-  }
-
-  html.dark .text-slate-700 {
-    color: #CBD5E1 !important;
-  }
-
-  html.dark .text-slate-600 {
-    color: #94A3B8 !important;
-  }
-
-  html.dark .text-slate-500 {
-    color: #64748B !important;
-  }
-
-  html.dark .border-slate-200 {
-    border-color: rgba(255, 255, 255, 0.05) !important;
-  }
-
-  html.dark .border-slate-300 {
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    min-height: 100vh;
   }
 }
 
