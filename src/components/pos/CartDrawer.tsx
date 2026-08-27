@@ -6,15 +6,10 @@ import {
   Trash2, 
   Plus, 
   Minus, 
-  DollarSign, 
-  CreditCard, 
-  Banknote, 
-  PauseCircle, 
-  PlayCircle, 
-  UserPlus, 
-  FileText,
   Clock,
-  CheckCircle2,
+  PauseCircle,
+  UserPlus,
+  FileText,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
@@ -60,7 +55,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       return;
     }
     holdCurrentBill();
-    showToast('Bill parked on hold', 'success', 'You can recall it anytime from the Held Bills list');
+    showToast('Bill parked on hold', 'success', 'You can recall it anytime');
   };
 
   const handleRecallBill = (id: string, billNo: string) => {
@@ -70,82 +65,56 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-[#222327] rounded-2xl border border-slate-100/60 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-lg p-5 text-slate-900 dark:text-white flex flex-col justify-between space-y-4">
+    <div className="bg-white dark:bg-[#222327] rounded-2xl border border-slate-100/60 dark:border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 text-slate-900 dark:text-white flex flex-col justify-between space-y-4">
       
-      {/* Top Header: Dispensing Slip Title & Hold Actions */}
       <div>
-        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-3">
           <div className="flex items-center space-x-2">
-            <div className="p-2 bg-teal-50 text-teal-700 rounded-xl border border-teal-200">
+            <div className="p-2 bg-[#4E60FF]/10 text-[#4E60FF] rounded-xl border border-[#4E60FF]/20">
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-black text-base text-slate-900">Active Dispensing Ledger</h2>
-              <p className="text-[11px] text-slate-500">{cart.length} item(s) in active slip</p>
+              <h2 className="font-bold text-base text-slate-900 dark:text-white">Active Dispensing Slip</h2>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">{cart.length} item(s) in active slip</p>
             </div>
           </div>
 
           <div className="flex items-center space-x-1.5">
             {heldBills.length > 0 && (
-              <button
-                onClick={() => setShowHeldBillsDrawer(!showHeldBillsDrawer)}
-                className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 rounded-lg text-xs font-bold transition-all flex items-center space-x-1"
-              >
-                <PauseCircle className="w-3.5 h-3.5 text-amber-600" />
+              <button onClick={() => setShowHeldBillsDrawer(!showHeldBillsDrawer)} className="px-2.5 py-1 bg-[#FBBF24]/20 border border-[#FBBF24]/30 text-[#F59E0B] rounded-lg text-xs font-bold transition-all flex items-center space-x-1">
+                <PauseCircle className="w-3.5 h-3.5" />
                 <span>Held ({heldBills.length})</span>
               </button>
             )}
-
             {cart.length > 0 && (
-              <button
-                onClick={handleHoldBill}
-                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all"
-                title="Hold Bill [F8]"
-              >
+              <button onClick={handleHoldBill} className="px-2.5 py-1 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition-all">
                 Hold [F8]
               </button>
             )}
-
             {cart.length > 0 && (
-              <button
-                onClick={clearCart}
-                className="p-1 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50"
-                title="Clear Cart"
-              >
+              <button onClick={clearCart} className="p-1.5 text-slate-400 hover:text-[#EF4444] rounded-lg hover:bg-[#EF4444]/10 transition-all">
                 <Trash2 className="w-4 h-4" />
               </button>
             )}
           </div>
         </div>
 
-        {/* Collapsible Held Bills Drawer */}
         {showHeldBillsDrawer && heldBills.length > 0 && (
-          <div className="mt-3 p-3 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2 animate-in fade-in duration-150">
-            <div className="flex items-center justify-between text-xs font-extrabold text-amber-900">
-              <span>Parked Customer Bills ({heldBills.length})</span>
-              <button onClick={() => setShowHeldBillsDrawer(false)} className="text-amber-700 hover:text-amber-900 text-[10px]">Close</button>
+          <div className="mt-3 p-3 bg-[#FBBF24]/10 border border-[#FBBF24]/20 rounded-xl space-y-2 animate-in fade-in">
+            <div className="flex items-center justify-between text-xs font-bold text-[#F59E0B]">
+              <span>Parked Bills ({heldBills.length})</span>
+              <button onClick={() => setShowHeldBillsDrawer(false)} className="text-[#F59E0B] hover:text-amber-800 text-[10px]">Close</button>
             </div>
-            
             <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
               {heldBills.map(h => (
-                <div key={h.id} className="p-2 bg-white border border-amber-200 rounded-lg flex items-center justify-between text-xs">
+                <div key={h.id} className="p-2 bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/5 rounded-xl flex items-center justify-between text-xs shadow-sm">
                   <div>
-                    <span className="font-mono font-bold text-amber-800">{h.billNumber}</span>
-                    <p className="text-[11px] text-slate-600">{h.patientName} • {h.items.length} items • <b className="text-slate-900">GH₵ {h.total.toFixed(2)}</b></p>
+                    <span className="font-mono font-bold text-[#4E60FF]">{h.billNumber}</span>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400">{h.patientName} • {h.items.length} items • <b className="text-slate-900 dark:text-white tabular-nums">GH₵ {h.total.toFixed(2)}</b></p>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <button
-                      onClick={() => handleRecallBill(h.id, h.billNumber)}
-                      className="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-[11px] font-bold"
-                    >
-                      Recall
-                    </button>
-                    <button
-                      onClick={() => deleteHeldBill(h.id)}
-                      className="p-1 text-slate-400 hover:text-red-600"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <button onClick={() => handleRecallBill(h.id, h.billNumber)} className="px-2 py-1 bg-[#4E60FF] hover:bg-[#3D4FE6] text-white rounded-lg text-[11px] font-bold">Recall</button>
+                    <button onClick={() => deleteHeldBill(h.id)} className="p-1 text-slate-400 hover:text-[#EF4444]"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
               ))}
@@ -153,191 +122,87 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           </div>
         )}
 
-        {/* Collapsible Patient / Prescribing Doctor Input */}
         <div className="mt-3">
-          <button
-            onClick={() => setShowPatientDetailsInput(!showPatientDetailsInput)}
-            className="text-xs font-bold text-teal-800 hover:text-teal-900 flex items-center space-x-1"
-          >
-            <UserPlus className="w-3.5 h-3.5 text-teal-600" />
-            <span>{patientDetails.name ? `Client: ${patientDetails.name}` : '+ Add Patient / Doctor Rx Details [F4]'}</span>
+          <button onClick={() => setShowPatientDetailsInput(!showPatientDetailsInput)} className="text-xs font-bold text-[#4E60FF] hover:text-[#3D4FE6] flex items-center space-x-1">
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>{patientDetails.name ? `Client: ${patientDetails.name}` : '+ Add Patient / Doctor Rx Details'}</span>
             {showPatientDetailsInput ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
 
           {showPatientDetailsInput && (
-            <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+            <div className="mt-2 p-3 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100 dark:border-white/5 rounded-xl space-y-2 text-xs">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 block mb-0.5">Patient Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Ama Serwaa"
-                    value={patientDetails.name}
-                    onChange={(e) => setPatientDetails({ ...patientDetails, name: e.target.value })}
-                    className="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-semibold"
-                  />
+                  <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-0.5">Patient Name</label>
+                  <input type="text" placeholder="e.g. Ama Serwaa" value={patientDetails.name} onChange={(e) => setPatientDetails({ ...patientDetails, name: e.target.value })} className="w-full p-2 bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/10 rounded-xl text-slate-900 dark:text-white font-medium text-xs focus:outline-none focus:ring-2 focus:ring-[#4E60FF]" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-slate-500 block mb-0.5">WhatsApp Phone</label>
-                  <input
-                    type="text"
-                    placeholder="024XXXXXXX"
-                    value={patientDetails.phone}
-                    onChange={(e) => setPatientDetails({ ...patientDetails, phone: e.target.value })}
-                    className="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono"
-                  />
+                  <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-0.5">WhatsApp Phone</label>
+                  <input type="text" placeholder="024XXXXXXX" value={patientDetails.phone} onChange={(e) => setPatientDetails({ ...patientDetails, phone: e.target.value })} className="w-full p-2 bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/10 rounded-xl text-slate-900 dark:text-white font-mono text-xs focus:outline-none focus:ring-2 focus:ring-[#4E60FF]" />
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-slate-500 block mb-0.5">Prescribing Doctor (Optional)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Dr. K. Osei (Korle Bu)"
-                  value={patientDetails.doctor}
-                  onChange={(e) => setPatientDetails({ ...patientDetails, doctor: e.target.value })}
-                  className="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-slate-900"
-                />
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-0.5">Prescribing Doctor (Optional)</label>
+                <input type="text" placeholder="e.g. Dr. K. Osei (Korle Bu)" value={patientDetails.doctor} onChange={(e) => setPatientDetails({ ...patientDetails, doctor: e.target.value })} className="w-full p-2 bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/10 rounded-xl text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#4E60FF]" />
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Cart Items List */}
       <div className="flex-1 space-y-2.5 max-h-[340px] overflow-y-auto pr-1 my-2">
         {cart.length === 0 ? (
           <div className="py-12 text-center text-slate-400 space-y-2">
-            <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto" />
-            <p className="text-xs font-semibold text-slate-600">No medicines added to dispensing slip yet</p>
-            <p className="text-[11px] text-slate-400">Click any drug on the left panel or press <kbd className="px-1 bg-slate-100 rounded border border-slate-300 font-mono text-teal-700 font-bold">/</kbd> to search</p>
+            <ShoppingBag className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
+            <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">No medicines added to dispensing slip yet</p>
+            <p className="text-[11px] text-slate-400">Click any drug on the left panel or press <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/10 text-[#4E60FF] rounded font-mono font-bold text-[10px]">/</kbd> to search</p>
           </div>
         ) : (
           cart.map((item) => {
-            // Get available batches for manual override selection
-            const availableBatches = batches.filter(
-              b => b.productId === item.product.id && b.branchId === activeBranchId && b.quantity > 0
-            );
-
+            const availableBatches = batches.filter(b => b.productId === item.product.id && b.branchId === activeBranchId && b.quantity > 0);
             return (
-              <div
-                key={`${item.product.id}-${item.selectedBatch.id}`}
-                className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 shadow-2xs"
-              >
-                {/* Title & Price */}
+              <div key={`${item.product.id}-${item.selectedBatch.id}`} className="p-3 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100/60 dark:border-white/5 rounded-xl space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="font-extrabold text-xs text-slate-900">{item.product.brandName}</h4>
-                    <p className="text-[10px] text-slate-500">{item.product.strength} ({item.product.dosageForm})</p>
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">{item.product.brandName}</h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">{item.product.strength} ({item.product.dosageForm})</p>
                   </div>
-                  <span className="font-black text-xs text-slate-900 tabular-nums">
-                    GH₵ {item.lineTotal.toFixed(2)}
-                  </span>
+                  <span className="font-bold text-xs text-slate-900 dark:text-white tabular-nums">GH₵ {item.lineTotal.toFixed(2)}</span>
                 </div>
 
-                {/* Batch Selection Dropdown (Manual FEFO Override) */}
-                <div className="flex items-center justify-between text-[11px] bg-white p-1.5 rounded-lg border border-slate-200">
-                  <span className="text-slate-500 font-semibold flex items-center">
-                    <Clock className="w-3 h-3 text-teal-600 mr-1" /> Batch:
-                  </span>
-
-                  <select
-                    value={item.selectedBatch.id}
-                    onChange={(e) => updateCartItemBatch(item.product.id, e.target.value)}
-                    className="bg-transparent text-[11px] font-mono font-bold text-teal-800 focus:outline-none cursor-pointer max-w-[200px] truncate"
-                  >
-                    {availableBatches.map(b => (
-                      <option key={b.id} value={b.id}>
-                        {b.batchNumber} (Exp: {b.expiryDate}) [{b.quantity} left]
-                      </option>
-                    ))}
+                <div className="flex items-center justify-between text-[11px] bg-white dark:bg-[#222327] p-1.5 rounded-lg border border-slate-100 dark:border-white/5">
+                  <span className="text-slate-500 dark:text-slate-400 font-semibold flex items-center"><Clock className="w-3 h-3 text-[#4E60FF] mr-1" /> Batch:</span>
+                  <select value={item.selectedBatch.id} onChange={(e) => updateCartItemBatch(item.product.id, e.target.value)} className="bg-transparent text-[11px] font-mono font-bold text-[#4E60FF] focus:outline-none cursor-pointer max-w-[200px] truncate">
+                    {availableBatches.map(b => <option key={b.id} value={b.id}>{b.batchNumber} (Exp: {b.expiryDate}) [{b.quantity} left]</option>)}
                   </select>
                 </div>
 
-                {/* Steppers & Line Actions */}
                 <div className="flex items-center justify-between pt-1">
-                  <div className="flex items-center space-x-1.5 bg-white border border-slate-300 rounded-lg p-0.5">
-                    <button
-                      onClick={() => updateCartItemQty(item.product.id, item.quantity - 1)}
-                      className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="px-2 font-black text-xs text-slate-900 tabular-nums">{item.quantity}</span>
-                    <button
-                      onClick={() => updateCartItemQty(item.product.id, item.quantity + 1)}
-                      className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
+                  <div className="flex items-center space-x-1.5 bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/10 rounded-lg p-0.5">
+                    <button onClick={() => updateCartItemQty(item.product.id, item.quantity - 1)} className="p-1 text-slate-600 dark:text-slate-300 hover:bg-[#F3F4F7] dark:hover:bg-white/5 rounded"><Minus className="w-3 h-3" /></button>
+                    <span className="px-2 font-bold text-xs text-slate-900 dark:text-white tabular-nums">{item.quantity}</span>
+                    <button onClick={() => updateCartItemQty(item.product.id, item.quantity + 1)} className="p-1 text-slate-600 dark:text-slate-300 hover:bg-[#F3F4F7] dark:hover:bg-white/5 rounded"><Plus className="w-3 h-3" /></button>
                   </div>
-
-                  <button
-                    onClick={() => removeFromCart(item.product.id)}
-                    className="text-xs text-slate-400 hover:text-red-600 p-1"
-                  >
-                    Remove
-                  </button>
+                  <button onClick={() => removeFromCart(item.product.id)} className="text-xs text-slate-400 hover:text-[#EF4444] p-1">Remove</button>
                 </div>
-
               </div>
             );
           })
         )}
       </div>
 
-      {/* Footer Totals & Quick Pay Grid */}
       <div className="border-t border-slate-100 dark:border-white/5 pt-3 space-y-3">
-        
-        {/* Subtotal & Discount Box */}
-        <div className="bg-slate-50 border border-slate-100/80 dark:bg-white/5 dark:border-white/5 p-3 rounded-xl space-y-1 text-xs text-slate-900 dark:text-white">
-          <div className="flex justify-between text-slate-600 dark:text-slate-400">
-            <span>Subtotal:</span>
-            <span className="font-semibold tabular-nums text-slate-900 dark:text-white">GH₵ {cartSubtotal.toFixed(2)}</span>
-          </div>
-
-          <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
-            <span>Discount (GH₵):</span>
-            <input
-              type="number"
-              min="0"
-              value={cartDiscount || ''}
-              onChange={(e) => setCartDiscount(parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-              className="w-20 p-1 bg-white dark:bg-[#161719] border border-slate-200 dark:border-white/10 rounded text-right text-xs font-bold text-slate-900 dark:text-white"
-            />
-          </div>
-
-          <div className="flex justify-between items-center text-base font-bold text-slate-900 dark:text-white pt-1.5 border-t border-slate-200/80 dark:border-white/10">
-            <span>NET TOTAL DUE:</span>
-            <span className="text-xl text-[#4E60FF] tabular-nums font-bold">GH₵ {cartTotal.toFixed(2)}</span>
-          </div>
+        <div className="bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100/60 dark:border-white/5 p-3 rounded-xl space-y-1.5 text-xs text-slate-900 dark:text-white">
+          <div className="flex justify-between text-slate-600 dark:text-slate-400"><span>Subtotal:</span><span className="font-semibold tabular-nums text-slate-900 dark:text-white">GH₵ {cartSubtotal.toFixed(2)}</span></div>
+          <div className="flex justify-between items-center text-slate-600 dark:text-slate-400"><span>Discount (GH₵):</span><input type="number" min="0" value={cartDiscount || ''} onChange={(e) => setCartDiscount(parseFloat(e.target.value) || 0)} placeholder="0.00" className="w-20 p-1.5 bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/10 rounded-lg text-right text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#4E60FF]" /></div>
+          <div className="flex justify-between items-center text-base font-bold text-slate-900 dark:text-white pt-1.5 border-t border-slate-200 dark:border-white/10"><span>NET TOTAL DUE:</span><span className="text-xl text-[#4E60FF] tabular-nums font-bold">GH₵ {cartTotal.toFixed(2)}</span></div>
         </div>
 
-        {/* Quick Pay Buttons Grid */}
         <div className="grid grid-cols-2 gap-2 pt-1">
-          <button
-            disabled={cart.length === 0}
-            onClick={onOpenCashModal}
-            className="flex items-center justify-center space-x-1.5 py-3 bg-[#10B981] hover:bg-emerald-600 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-semibold text-xs rounded-xl shadow-md transition-all cursor-pointer"
-            title="Exact Cash Pay [F4]"
-          >
-            <Banknote className="w-4 h-4" />
-            <span>Exact Cash [F4]</span>
-          </button>
-
-          <button
-            disabled={cart.length === 0}
-            onClick={onOpenMoMoModal}
-            className="flex items-center justify-center space-x-1.5 py-3 bg-[#4E60FF] hover:bg-[#3D4FE6] disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-semibold text-xs rounded-xl shadow-md transition-all cursor-pointer"
-            title="MoMo / Split Pay [F9]"
-          >
-            <CreditCard className="w-4 h-4" />
-            <span>MoMo / Split [F9]</span>
-          </button>
+          <button disabled={cart.length === 0} onClick={onOpenCashModal} className="flex items-center justify-center space-x-1.5 py-3 bg-[#10B981] hover:bg-emerald-600 disabled:bg-slate-200 dark:disabled:bg-white/10 disabled:text-slate-400 text-white font-bold text-xs rounded-xl shadow-sm transition-all">Cash Pay</button>
+          <button disabled={cart.length === 0} onClick={onOpenMoMoModal} className="flex items-center justify-center space-x-1.5 py-3 bg-[#4E60FF] hover:bg-[#3D4FE6] disabled:bg-slate-200 dark:disabled:bg-white/10 disabled:text-slate-400 text-white font-bold text-xs rounded-xl shadow-sm transition-all">MoMo / Split</button>
         </div>
-
       </div>
-
     </div>
   );
 };

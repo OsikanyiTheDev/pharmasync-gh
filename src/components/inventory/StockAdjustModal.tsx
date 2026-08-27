@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, SlidersHorizontal, Plus, Minus, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { X, SlidersHorizontal, AlertTriangle } from 'lucide-react';
 import { usePharmacy } from '../../context/PharmacyContext';
-import { Batch, Product, AdjustmentReason } from '../../lib/types';
+import { Product, Batch, AdjustmentReason } from '../../lib/types';
 
 interface StockAdjustModalProps {
   isOpen: boolean;
@@ -12,140 +12,86 @@ interface StockAdjustModalProps {
   onClose: () => void;
 }
 
-export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
-  isOpen,
-  product,
-  batch,
-  onClose,
-}) => {
-  const { adjustBatchQuantity } = usePharmacy();
-
-  const [deltaType, setDeltaType] = useState<'ADD' | 'REMOVE'>('REMOVE');
-  const [amount, setAmount] = useState<number>(5);
-  const [reason, setReason] = useState<AdjustmentReason>('EXPIRY');
-  const [notes, setNotes] = useState<string>('');
+export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({ isOpen, product, batch, onClose }) => {
+  const { adjustBatchQuantity, activeBranchId } = usePharmacy();
+  const [adjustType, setAdjustType] = useState<'ADD' | 'REMOVE' | 'SET'>('ADD');
+  const [quantity, setQuantity] = useState<number>(1);
+  const [reason, setReason] = useState<string>('Damaged / Expired stock write-off');
+  const [reasonCode, setReasonCode] = useState<AdjustmentReason>('DAMAGE');
 
   if (!isOpen || !product || !batch) return null;
 
-  const handleAdjust = () => {
-    const finalDelta = deltaType === 'ADD' ? amount : -amount;
-    adjustBatchQuantity(product.id, batch.id, batch.branchId, finalDelta, reason, notes);
+  const handleConfirm = () => {
+    let delta = 0;
+    if (adjustType === 'ADD') delta = quantity;
+    if (adjustType === 'REMOVE') delta = -quantity;
+    if (adjustType === 'SET') delta = quantity - batch.quantity;
+    adjustBatchQuantity(product.id, batch.id, activeBranchId, delta, reasonCode, reason);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 text-slate-900 dark:text-slate-100 shadow-2xl relative animate-in fade-in zoom-in-95">
-        
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-        >
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-[#222327] border border-slate-100/60 dark:border-white/5 rounded-2xl max-w-md w-full p-6 text-slate-900 dark:text-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative animate-in fade-in zoom-in-95">
+        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5">
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center space-x-3 border-b border-slate-200 dark:border-slate-800 pb-4 mb-4">
-          <div className="p-2.5 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-xl border border-amber-200 dark:border-amber-500/20">
-            <SlidersHorizontal className="w-6 h-6" />
+        <div className="flex items-center space-x-2.5 border-b border-slate-100 dark:border-white/5 pb-3 mb-4">
+          <div className="p-2 bg-[#F59E0B]/10 text-[#F59E0B] rounded-xl border border-[#F59E0B]/20">
+            <SlidersHorizontal className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Adjust Batch Quantity</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Manual stock adjustment audit record</p>
+            <h3 className="font-bold text-base text-slate-900 dark:text-white">Stock Adjustment</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Adjust batch quantity with audit reason</p>
           </div>
         </div>
 
-        <div className="bg-slate-50 dark:bg-[#0b0f19] p-3 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1 mb-4">
-          <p className="font-extrabold text-sm text-slate-900 dark:text-slate-100">{product.brandName}</p>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            Batch: <span className="font-mono text-teal-800 dark:text-emerald-400 font-bold">{batch.batchNumber}</span> • Branch: {batch.branchId}
-          </p>
-          <p className="text-xs text-slate-600 dark:text-slate-400">Current Stock: <b className="text-slate-900 dark:text-white">{batch.quantity}</b> units</p>
+        <div className="bg-[#F3F4F7] dark:bg-[#161719] p-3 rounded-xl border border-slate-100 dark:border-white/5 space-y-1 mb-4">
+          <p className="font-bold text-sm text-slate-900 dark:text-white">{product.brandName}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400">{product.genericName} • Batch: <span className="font-mono font-bold text-[#4E60FF]">{batch.batchNumber}</span> • Current: <b className="font-mono">{batch.quantity}</b></p>
         </div>
 
-        <div className="space-y-4">
-          
-          {/* Action type */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => setDeltaType('ADD')}
-              className={`flex items-center justify-center space-x-1.5 p-2 rounded-xl border text-xs font-bold transition-all ${
-                deltaType === 'ADD'
-                  ? 'bg-emerald-50 dark:bg-emerald-500/20 border-emerald-300 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300'
-                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Increase Stock (+)</span>
-            </button>
-
-            <button
-              onClick={() => setDeltaType('REMOVE')}
-              className={`flex items-center justify-center space-x-1.5 p-2 rounded-xl border text-xs font-bold transition-all ${
-                deltaType === 'REMOVE'
-                  ? 'bg-rose-50 dark:bg-red-500/20 border-rose-300 dark:border-red-500 text-rose-800 dark:text-red-300'
-                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              <Minus className="w-4 h-4" />
-              <span>Deduct Stock (-)</span>
-            </button>
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-2">
+            {(['ADD', 'REMOVE', 'SET'] as const).map(t => (
+              <button key={t} onClick={() => setAdjustType(t)} className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${adjustType === t ? 'bg-[#4E60FF] text-white border-[#4E60FF] shadow-sm' : 'bg-[#F3F4F7] dark:bg-[#161719] border-slate-100 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-50'}`}>{t === 'ADD' ? '+ Add Stock' : t === 'REMOVE' ? '- Remove' : '= Set Exact'}</button>
+            ))}
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Adjustment Quantity</label>
-            <input
-              type="number"
-              min="1"
-              value={amount}
-              onChange={(e) => setAmount(parseInt(e.target.value) || 1)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-900 dark:text-slate-100"
-            />
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Quantity</label>
+            <input type="number" min="0" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value) || 0)} className="w-full p-2.5 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-200 dark:border-white/10 rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#4E60FF]" />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Reason for Adjustment</label>
-            <select
-              value={reason}
-              onChange={(e) => setReason(e.target.value as AdjustmentReason)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200"
-            >
-              <option value="EXPIRY">Expired Medicine Removal</option>
-              <option value="DAMAGE">Damaged / Broken Blister Pack</option>
-              <option value="AUDIT_CORRECTION">Physical Audit Correction</option>
-              <option value="SHRINKAGE">Shrinkage / Loss</option>
-              <option value="RESTOCK_INTAKE">Direct Supplier Restock</option>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Reason Code</label>
+            <select value={reasonCode} onChange={(e) => setReasonCode(e.target.value as AdjustmentReason)} className="w-full p-2.5 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#4E60FF]">
+              <option value="DAMAGE">DAMAGE - Damaged / Expired</option>
+              <option value="EXPIRY">EXPIRY - Expired write-off</option>
+              <option value="AUDIT_CORRECTION">AUDIT_CORRECTION - Stock count correction</option>
+              <option value="RESTOCK_INTAKE">RESTOCK_INTAKE - Supplier adjustment</option>
+              <option value="SHRINKAGE">SHRINKAGE - Shrinkage / Other</option>
             </select>
           </div>
 
           <div>
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Audit Note</label>
-            <input
-              type="text"
-              placeholder="e.g. Expired batch discarded per FDA guidelines"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
-            />
+            <input type="text" placeholder="Additional notes (optional)" value={reason} onChange={(e) => setReason(e.target.value)} className="w-full p-2.5 bg-white dark:bg-[#222327] border border-slate-100 dark:border-white/10 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E60FF]" />
           </div>
 
+          <div className="p-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 rounded-xl flex items-start space-x-2 text-xs">
+            <AlertTriangle className="w-4 h-4 text-[#F59E0B] flex-shrink-0 mt-0.5" />
+            <span className="text-amber-800 dark:text-amber-300">This adjustment will be logged in the audit trail and sync to Supabase.</span>
+          </div>
         </div>
 
-        <div className="mt-6 pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end space-x-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl"
-          >
-            Cancel
-          </button>
-
-          <button
-            onClick={handleAdjust}
-            className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-md transition-all"
-          >
-            Save Stock Adjustment
+        <div className="mt-5 pt-3 border-t border-slate-100 dark:border-white/5 flex justify-end space-x-2">
+          <button onClick={onClose} className="px-4 py-2 bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
+          <button onClick={handleConfirm} className="flex items-center space-x-1.5 px-5 py-2 bg-[#4E60FF] hover:bg-[#3D4FE6] text-white font-bold text-xs rounded-xl shadow-sm transition-all">
+            <span>Confirm Adjustment</span>
           </button>
         </div>
-
       </div>
     </div>
   );

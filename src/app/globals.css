@@ -8,7 +8,6 @@
     --text-secondary: #64748B;
     --accent-blue: #4E60FF;
   }
-
   .dark {
     --bg-app: #161719;
     --bg-card: #222327;
@@ -16,12 +15,12 @@
     --text-secondary: #94A3B8;
     --accent-blue: #4E60FF;
   }
-
   body {
     background-color: var(--bg-app);
     color: var(--text-primary);
     min-height: 100vh;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
@@ -29,45 +28,43 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Custom scrollbars */
+@layer utilities {
+  .shadow-soft {
+    box-shadow: 0 8px 30px rgb(0,0,0,0.04);
+  }
+  .shadow-soft-lg {
+    box-shadow: 0 12px 40px rgb(0,0,0,0.06);
+  }
+}
+
+/* Custom scrollbars - subtle clinical */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: rgba(243, 244, 247, 0.8);
+  background: #F3F4F7;
 }
-
-html.dark ::-webkit-scrollbar-track {
-  background: rgba(22, 23, 25, 0.8);
+.dark ::-webkit-scrollbar-track {
+  background: #161719;
 }
-
 ::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.4);
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(78, 96, 255, 0.6);
 }
 
-/* Printable layout styling for receipt printing */
+/* Print styles */
 @media print {
   body {
     background-color: white !important;
     color: black !important;
   }
-
-  aside, 
-  header, 
-  nav, 
-  button, 
-  .no-print,
-  [role="dialog"] > *:not(#printable-receipt) {
+  aside, header, nav, button, .no-print, [role=\"dialog\"] > *:not(#printable-receipt) {
     display: none !important;
   }
-
   #printable-receipt {
     display: block !important;
     position: fixed !important;

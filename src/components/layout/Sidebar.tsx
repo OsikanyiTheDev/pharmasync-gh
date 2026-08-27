@@ -17,8 +17,8 @@ import {
   Moon,
   Menu,
   X,
-  UserCheck,
-  FileSpreadsheet
+  FileSpreadsheet,
+  MapPin
 } from 'lucide-react';
 import { usePharmacy } from '../../context/PharmacyContext';
 import { useOffline } from '../../context/OfflineContext';
@@ -47,10 +47,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
 
   return (
     <>
-      {/* Mobile Top Navigation Header (< md) */}
-      <div className="md:hidden sticky top-0 z-40 bg-white dark:bg-[#121315] text-slate-900 dark:text-slate-100 border-b border-slate-100 dark:border-white/5 px-4 py-3 flex items-center justify-between shadow-xs">
+      {/* Mobile Top Navigation Header */}
+      <div className="md:hidden sticky top-0 z-40 bg-white dark:bg-[#121315] text-slate-900 dark:text-slate-100 border-b border-slate-100 dark:border-white/5 px-4 py-3 flex items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <Link href="/" className="flex items-center space-x-2.5">
-          <div className="bg-[#FBBF24] p-2 rounded-xl text-slate-950 shadow-xs flex items-center justify-center">
+          <div className="bg-[#FBBF24] p-2.5 rounded-xl text-slate-950 shadow-xs flex items-center justify-center">
             <Pill className="w-5 h-5" />
           </div>
           <span className="font-bold text-base tracking-tight text-slate-900 dark:text-white">
@@ -61,7 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
         <div className="flex items-center space-x-2">
           <button
             onClick={toggleTheme}
-            className="p-2 bg-slate-100 dark:bg-[#222327] text-slate-700 dark:text-slate-300 rounded-xl transition-all"
+            className="p-2 bg-slate-50 dark:bg-[#222327] border border-slate-100 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl transition-all"
             title="Toggle Theme"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-[#4E60FF]" />}
@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
 
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="p-2 bg-slate-100 dark:bg-[#222327] text-slate-700 dark:text-slate-200 rounded-xl"
+            className="p-2 bg-slate-50 dark:bg-[#222327] border border-slate-100 dark:border-white/5 text-slate-700 dark:text-slate-200 rounded-xl"
           >
             {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -80,14 +80,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
       {isMobileOpen && (
         <div
           onClick={() => setIsMobileOpen(false)}
-          className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-40"
+          className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
         />
       )}
 
-      {/* Desktop & Mobile Slide-Out Sidebar */}
+      {/* Desktop & Mobile Slide-Out Sidebar - Clinical Spec */}
       <aside
-        className={`fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-[#121315] border-r border-slate-100 dark:border-white/5 flex flex-col justify-between z-30 transition-transform duration-200 ease-in-out ${
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        className={`fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-[#121315] border-r border-slate-100 dark:border-white/5 flex flex-col justify-between z-30 transition-all duration-200 ease-in-out ${
+          isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
         }`}
       >
         
@@ -117,11 +117,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
             </button>
           </div>
 
-          {/* Active Branch Switcher */}
-          <div className="bg-slate-50 dark:bg-[#161719] border border-slate-100 dark:border-white/5 p-2.5 rounded-xl space-y-1">
+          {/* Active Branch Switcher - Clinical Card */}
+          <div className="bg-[#F3F4F7] dark:bg-[#161719] border border-slate-100 dark:border-white/5 p-2.5 rounded-xl space-y-1">
             <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Branch Location</span>
             <div className="flex items-center space-x-2">
-              <Building2 className="w-4 h-4 text-[#4E60FF] flex-shrink-0" />
+              <MapPin className="w-4 h-4 text-[#4E60FF] flex-shrink-0" />
               <select
                 value={activeBranchId}
                 onChange={(e) => setActiveBranchId(e.target.value as any)}
@@ -137,7 +137,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
           </div>
         </div>
 
-        {/* Navigation Links */}
+        {/* Navigation Links - Clinical Spec */}
         <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto bg-white dark:bg-[#121315]">
           <p className="px-3 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Navigation</p>
           
@@ -174,7 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
           })}
         </div>
 
-        {/* Bottom Profile & Theme Toggle */}
+        {/* Bottom Profile & Theme Toggle - Clinical */}
         <div className="p-4 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-[#121315] space-y-3">
           
           <div className="flex items-center justify-between text-xs">
@@ -182,26 +182,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
               onClick={toggleOfflineSimulation}
               className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold ${
                 isOnline
-                  ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
-                  : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-400'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30'
+                  : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30'
               }`}
             >
               {isOnline ? (
                 <>
-                  <Wifi className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                  <Wifi className="w-3 h-3" />
                   <span>Online</span>
                 </>
               ) : (
                 <>
-                  <WifiOff className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                  <span>Offline</span>
+                  <WifiOff className="w-3 h-3" />
+                  <span>Offline ({syncQueue.length})</span>
                 </>
               )}
             </button>
 
             <button
               onClick={toggleTheme}
-              className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-100 dark:bg-[#222327] text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all"
+              className="flex items-center space-x-1.5 px-2.5 py-1 bg-[#F3F4F7] dark:bg-[#222327] border border-slate-100 dark:border-white/5 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all"
             >
               {theme === 'dark' ? (
                 <>
@@ -218,7 +218,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
 
             <button
               onClick={onOpenShortcuts}
-              className="p-1.5 bg-slate-100 dark:bg-[#222327] text-slate-600 dark:text-slate-300 rounded-lg"
+              className="p-1.5 bg-[#F3F4F7] dark:bg-[#222327] border border-slate-100 dark:border-white/5 text-slate-600 dark:text-slate-300 rounded-lg"
               title="Shortcuts [?]"
             >
               <Keyboard className="w-3.5 h-3.5" />
@@ -227,19 +227,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
 
           <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs">
             <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 rounded-full bg-[#4E60FF]/10 text-[#4E60FF] flex items-center justify-center font-bold text-xs">
-                {activeBranch.manager[0]}
+              <div className="w-7 h-7 rounded-full bg-[#4E60FF]/10 text-[#4E60FF] flex items-center justify-center font-bold text-xs border border-[#4E60FF]/20">
+                {activeBranch?.manager?.[0] || 'P'}
               </div>
               <div>
-                <p className="text-slate-900 dark:text-white font-bold text-[11px] leading-tight">{activeBranch.manager}</p>
-                <p className="text-[9px] text-slate-500 dark:text-slate-400">Pharmacist In-Charge</p>
+                <p className="font-bold text-slate-900 dark:text-white text-xs leading-tight">{activeBranch?.manager || 'Pharmacist'}</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">{activeBranch?.code || 'GH-PS-001'}</p>
               </div>
             </div>
-            <UserCheck className="w-4 h-4 text-emerald-500" />
+            <div className="w-2 h-2 rounded-full bg-[#10B981] shadow-sm animate-pulse" />
           </div>
 
         </div>
-
       </aside>
     </>
   );
