@@ -4,6 +4,19 @@
 -- Run this in your Supabase Dashboard -> SQL Editor
 -- ==============================================================================
 
+-- Create user_profiles table if not exists
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  full_name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  pin_code TEXT NOT NULL DEFAULT '1234',
+  role TEXT NOT NULL CHECK (role IN ('OWNER', 'BRANCH_MANAGER', 'CASHIER')),
+  branch_id UUID REFERENCES branches(id) ON DELETE SET NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- 1. Enable RLS and create public access policies for client app sync
 DO $$ BEGIN
   ALTER TABLE branches ENABLE ROW LEVEL SECURITY;
@@ -13,7 +26,15 @@ DO $$ BEGIN
   ALTER TABLE sale_items ENABLE ROW LEVEL SECURITY;
   ALTER TABLE transfers ENABLE ROW LEVEL SECURITY;
   ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 EXCEPTION WHEN OTHERS THEN NULL; END $$;
+
+DROP POLICY IF EXISTS "Public select user_profiles" ON user_profiles;
+CREATE POLICY "Public select user_profiles" ON user_profiles FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public insert user_profiles" ON user_profiles;
+CREATE POLICY "Public insert user_profiles" ON user_profiles FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public update user_profiles" ON user_profiles;
+CREATE POLICY "Public update user_profiles" ON user_profiles FOR UPDATE USING (true);
 
 DROP POLICY IF EXISTS "Public select branches" ON branches;
 CREATE POLICY "Public select branches" ON branches FOR SELECT USING (true);
@@ -60,6 +81,19 @@ ON CONFLICT (code) DO UPDATE SET
   location = EXCLUDED.location, 
   phone = EXCLUDED.phone, 
   manager = EXCLUDED.manager;
+
+-- 2.1 Seed Demo Counter User Profiles
+INSERT INTO user_profiles (id, full_name, email, pin_code, role, branch_id, is_active)
+VALUES
+  ('u0000000-0001-4000-8000-000000000001', 'Dr. Kwame Mensah', 'kwame.mensah@pharmasync.gh', '9999', 'OWNER', 'a1b2c3d4-0001-4000-8000-000000000001', true),
+  ('u0000000-0002-4000-8000-000000000002', 'Abena Osei', 'abena.osei@pharmasync.gh', '5555', 'BRANCH_MANAGER', 'a1b2c3d4-0002-4000-8000-000000000002', true),
+  ('u0000000-0003-4000-8000-000000000003', 'Kofi Boateng', 'kofi.boateng@pharmasync.gh', '1234', 'CASHIER', 'a1b2c3d4-0003-4000-8000-000000000003', true)
+ON CONFLICT (email) DO UPDATE SET
+  full_name = EXCLUDED.full_name,
+  pin_code = EXCLUDED.pin_code,
+  role = EXCLUDED.role,
+  branch_id = EXCLUDED.branch_id,
+  is_active = EXCLUDED.is_active;
 
 -- 3. Seed Master Ghanaian Medicine Catalog
 INSERT INTO medicines (id, brand_name, generic_name, category, dosage_form, strength, pack_size, retail_price, cost_price, reorder_level, requires_prescription, nafdac_fda_no)

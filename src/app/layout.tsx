@@ -9,6 +9,7 @@ import { ThemeProvider } from '../context/ThemeContext';
 import { Sidebar } from '../components/layout/Sidebar';
 import { MobileNav } from '../components/layout/MobileNav';
 import { KeyboardModal } from '../components/layout/KeyboardModal';
+import { PinLockModal } from '../components/auth/PinLockModal';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isKeyboardModalOpen, setIsKeyboardModalOpen] = useState(false);
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
                 <MobileNav />
                 <KeyboardModal isOpen={isKeyboardModalOpen} onClose={() => setIsKeyboardModalOpen(false)} />
+                <PinLockModal />
               </PharmacyProvider>
             </OfflineProvider>
           </ToastProvider>

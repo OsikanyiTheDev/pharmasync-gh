@@ -1,4 +1,34 @@
-import { Branch, Product, Batch, InterBranchTransfer, Sale } from './types';
+import { Branch, Product, Batch, InterBranchTransfer, Sale, UserProfile } from './types';
+
+export const INITIAL_USER_PROFILES: UserProfile[] = [
+  {
+    id: 'u0000000-0001-4000-8000-000000000001',
+    fullName: 'Dr. Kwame Mensah',
+    email: 'kwame.mensah@pharmasync.gh',
+    pinCode: '9999',
+    role: 'OWNER',
+    branchId: 'ACCRA_MAIN',
+    isActive: true,
+  },
+  {
+    id: 'u0000000-0002-4000-8000-000000000002',
+    fullName: 'Abena Osei',
+    email: 'abena.osei@pharmasync.gh',
+    pinCode: '5555',
+    role: 'BRANCH_MANAGER',
+    branchId: 'OSU_BRANCH',
+    isActive: true,
+  },
+  {
+    id: 'u0000000-0003-4000-8000-000000000003',
+    fullName: 'Kofi Boateng',
+    email: 'kofi.boateng@pharmasync.gh',
+    pinCode: '1234',
+    role: 'CASHIER',
+    branchId: 'SPINTEX_BRANCH',
+    isActive: true,
+  },
+];
 
 export const INITIAL_BRANCHES: Branch[] = [
   {

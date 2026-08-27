@@ -6,6 +6,7 @@ import { BranchId, Product, Batch } from '../../lib/types';
 import { getBatchExpiryStatus } from '../../lib/fefo';
 import { StockTransferModal } from '../../components/inventory/StockTransferModal';
 import { StockAdjustModal } from '../../components/inventory/StockAdjustModal';
+import { ManagerPinModal } from '../../components/auth/ManagerPinModal';
 import Link from 'next/link';
 import { 
   Package, 
@@ -21,16 +22,22 @@ import {
   ChevronRight,
   MapPin,
   FileSpreadsheet,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  Eye
 } from 'lucide-react';
 
 export default function InventoryPage() {
-  const { branches, activeBranchId, products, batches } = usePharmacy();
+  const { branches, activeBranchId, products, batches, activeUser } = usePharmacy();
 
   const [selectedBranchFilter, setSelectedBranchFilter] = useState<BranchId | 'ALL'>(activeBranchId);
   const [selectedExpiryFilter, setSelectedExpiryFilter] = useState<'ALL' | 'HEALTHY' | 'EXPIRING_SOON' | 'EXPIRED'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
+
+  // Manager PIN Elevation for Cashiers to view Wholesale Cost Prices
+  const [isCostUnlocked, setIsCostUnlocked] = useState(false);
+  const [isManagerModalOpen, setIsManagerModalOpen] = useState(false);
 
   // Modals
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
@@ -346,7 +353,22 @@ export default function InventoryPage() {
                         </td>
 
                         <td className="py-3.5 px-3 text-right font-mono tabular-nums text-slate-500">
-                          GH₵ {product.costPrice.toFixed(2)}
+                          {activeUser?.role === 'CASHIER' && !isCostUnlocked ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsManagerModalOpen(true);
+                              }}
+                              className="px-2 py-0.5 bg-slate-100 hover:bg-amber-50 text-slate-400 hover:text-amber-700 rounded text-[11px] font-bold border border-slate-200 transition-all flex items-center justify-end space-x-1 ml-auto cursor-pointer"
+                              title="Unlock Wholesale Cost with Manager PIN"
+                            >
+                              <Lock className="w-3 h-3 text-amber-500" />
+                              <span>•••••</span>
+                            </button>
+                          ) : (
+                            `GH₵ ${product.costPrice.toFixed(2)}`
+                          )}
                         </td>
 
                         <td className="py-3.5 px-3 text-right font-mono font-bold tabular-nums text-slate-900">
@@ -354,7 +376,11 @@ export default function InventoryPage() {
                         </td>
 
                         <td className="py-3.5 px-3 text-right font-bold text-[#10B981] tabular-nums">
-                          {marginPercent.toFixed(1)}%
+                          {activeUser?.role === 'CASHIER' && !isCostUnlocked ? (
+                            <span className="text-slate-300 font-normal">Hidden</span>
+                          ) : (
+                            `${marginPercent.toFixed(1)}%`
+                          )}
                         </td>
 
                         <td className="py-3.5 px-4 text-center">
@@ -460,6 +486,15 @@ export default function InventoryPage() {
         product={adjustTargetProduct}
         batch={adjustTargetBatch}
         onClose={() => setIsAdjustModalOpen(false)}
+      />
+
+      {/* Manager Elevation Modal */}
+      <ManagerPinModal
+        isOpen={isManagerModalOpen}
+        onClose={() => setIsManagerModalOpen(false)}
+        onSuccess={() => setIsCostUnlocked(true)}
+        title="Unlock Wholesale Cost Prices"
+        description="Enter Manager or Owner PIN code to view wholesale cost prices and margin calculations."
       />
 
     </div>

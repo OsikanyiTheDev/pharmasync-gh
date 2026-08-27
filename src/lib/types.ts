@@ -1,5 +1,17 @@
 export type BranchId = 'ACCRA_MAIN' | 'OSU_BRANCH' | 'SPINTEX_BRANCH';
 
+export type UserRole = 'OWNER' | 'BRANCH_MANAGER' | 'CASHIER';
+
+export interface UserProfile {
+  id: string;
+  fullName: string;
+  email: string;
+  pinCode: string;
+  role: UserRole;
+  branchId: BranchId;
+  isActive: boolean;
+}
+
 export interface Branch {
   id: BranchId;
   name: string;

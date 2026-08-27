@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Pill, Building2, Wifi, WifiOff, Keyboard, Package, Truck, BarChart3, RefreshCw, Menu, X, FileSpreadsheet, MapPin } from 'lucide-react';
+import { Pill, Building2, Wifi, WifiOff, Keyboard, Package, Truck, BarChart3, RefreshCw, Menu, X, FileSpreadsheet, MapPin, Users, Lock } from 'lucide-react';
 import { usePharmacy } from '../../context/PharmacyContext';
 import { useOffline } from '../../context/OfflineContext';
 
@@ -11,18 +11,26 @@ interface SidebarProps { onOpenShortcuts: () => void; }
 
 export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
   const pathname = usePathname();
-  const { branches, activeBranchId, setActiveBranchId, activeBranch } = usePharmacy();
+  const { branches, activeBranchId, setActiveBranchId, activeBranch, activeUser, lockStation } = usePharmacy();
   const { isOnline, syncQueue, toggleOfflineSimulation } = useOffline();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
+  const isCashier = activeUser?.role === 'CASHIER';
+
   const navItems = [
-    { href: '/', label: 'POS Dispensing', icon: Pill, badge: null },
-    { href: '/inventory', label: 'Multi-Branch Inventory', icon: Package, badge: 'FEFO' },
-    { href: '/inventory/import', label: 'Bulk Stock Importer', icon: FileSpreadsheet, badge: 'CSV' },
-    { href: '/restock', label: 'Wholesale Restock', icon: Truck, badge: 'Market' },
-    { href: '/analytics', label: 'Sales & Profit', icon: BarChart3, badge: 'KPI' },
-    { href: '/transfers', label: 'Stock Transfers', icon: RefreshCw, badge: null },
+    { href: '/', label: 'POS Dispensing', icon: Pill, badge: null, restricted: false },
+    { href: '/inventory', label: 'Multi-Branch Inventory', icon: Package, badge: 'FEFO', restricted: false },
+    { href: '/inventory/import', label: 'Bulk Stock Importer', icon: FileSpreadsheet, badge: 'CSV', restricted: isCashier },
+    { href: '/restock', label: 'Wholesale Restock', icon: Truck, badge: 'Market', restricted: isCashier },
+    { href: '/analytics', label: 'Sales & Profit', icon: BarChart3, badge: isCashier ? '🔒 PIN' : 'KPI', restricted: isCashier },
+    { href: '/transfers', label: 'Stock Transfers', icon: RefreshCw, badge: null, restricted: false },
+    { href: '/users', label: 'Staff & PIN Management', icon: Users, badge: 'Staff', restricted: false },
   ];
+
+  const roleColor = 
+    activeUser?.role === 'OWNER' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
+    activeUser?.role === 'BRANCH_MANAGER' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+    'bg-emerald-50 text-emerald-700 border-emerald-200';
 
   return (
     <>
@@ -70,11 +78,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
             <button onClick={toggleOfflineSimulation} className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border ${isOnline ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-amber-50 text-amber-800 border-amber-100'}`}>
               {isOnline ? <><Wifi className="w-3 h-3" /><span>Online</span></> : <><WifiOff className="w-3 h-3" /><span>Offline ({syncQueue.length})</span></>}
             </button>
-            <button onClick={onOpenShortcuts} className="p-1.5 bg-[#F3F4F7] border border-slate-100 text-slate-600 rounded-lg"><Keyboard className="w-3.5 h-3.5" /></button>
+            <div className="flex items-center space-x-1">
+              <button onClick={onOpenShortcuts} className="p-1.5 bg-[#F3F4F7] border border-slate-100 text-slate-600 hover:text-slate-900 rounded-lg transition-all" title="Hotkeys [?]"><Keyboard className="w-3.5 h-3.5" /></button>
+              <button onClick={lockStation} className="p-1.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 rounded-lg transition-all" title="Fast Lock Station [F10]"><Lock className="w-3.5 h-3.5" /></button>
+            </div>
           </div>
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-            <div className="flex items-center space-x-2"><div className="w-7 h-7 rounded-full bg-[#4E60FF]/10 text-[#4E60FF] flex items-center justify-center font-bold text-xs border border-[#4E60FF]/20">{activeBranch?.manager?.[0] || 'P'}</div><div><p className="font-bold text-slate-900 text-xs leading-tight">{activeBranch?.manager || 'Pharmacist'}</p><p className="text-[10px] text-slate-500">{activeBranch?.code || 'GH-PS-001'}</p></div></div>
-            <div className="w-2 h-2 rounded-full bg-[#10B981] shadow-sm animate-pulse" />
+            <div className="flex items-center space-x-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-[#4E60FF]/10 text-[#4E60FF] flex items-center justify-center font-black text-xs border border-[#4E60FF]/20 flex-shrink-0">
+                {activeUser?.fullName?.[0] || 'U'}
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold text-slate-900 text-xs leading-tight truncate">{activeUser?.fullName || activeBranch?.manager}</p>
+                <span className={`inline-block px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-tight border ${roleColor}`}>
+                  {activeUser?.role || 'PHARMACIST'}
+                </span>
+              </div>
+            </div>
+            <button onClick={lockStation} className="text-slate-400 hover:text-red-500 p-1 rounded-lg" title="Lock counter [F10]">
+              <Lock className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </aside>

@@ -13,12 +13,15 @@ import {
   StockAdjustment,
   AdjustmentReason,
   HeldBill,
+  UserProfile,
+  UserRole,
 } from '../lib/types';
 import {
   INITIAL_BRANCHES,
   INITIAL_PRODUCTS,
   INITIAL_BATCHES,
   INITIAL_TRANSFERS,
+  INITIAL_USER_PROFILES,
 } from '../lib/seed-data';
 import { autoSelectFEFOBatch } from '../lib/fefo';
 import { StorageEngine } from '../lib/db';
@@ -37,6 +40,17 @@ const UUID_TO_BRANCH_CODE: Record<string, BranchId> = {
 };
 
 interface PharmacyContextType {
+  // Auth & Counter User Management
+  userProfiles: UserProfile[];
+  activeUser: UserProfile;
+  isLocked: boolean;
+  lockStation: () => void;
+  unlockStation: (pin: string, userId?: string) => boolean;
+  switchUserByProfileId: (id: string) => void;
+  addUserProfile: (profile: Omit<UserProfile, 'id'>) => Promise<UserProfile>;
+  updateUserProfile: (id: string, updates: Partial<UserProfile>) => Promise<void>;
+  verifyManagerPin: (pin: string) => boolean;
+
   // Loading State
   isLoading: boolean;
 
@@ -99,6 +113,11 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [branches, setBranches] = useState<Branch[]>(INITIAL_BRANCHES);
   const [activeBranchId, setActiveBranchId] = useState<BranchId>('ACCRA_MAIN');
 
+  // User Profiles & Auth PIN Lock State
+  const [userProfiles, setUserProfiles] = useState<UserProfile[]>(INITIAL_USER_PROFILES);
+  const [activeUser, setActiveUser] = useState<UserProfile>(INITIAL_USER_PROFILES[0]);
+  const [isLocked, setIsLocked] = useState<boolean>(false);
+
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [batches, setBatches] = useState<Batch[]>(INITIAL_BATCHES);
   
@@ -113,9 +132,121 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [transfers, setTransfers] = useState<InterBranchTransfer[]>(INITIAL_TRANSFERS);
   const [adjustments, setAdjustments] = useState<StockAdjustment[]>([]);
 
+  // Auth & Counter User helper functions
+  const lockStation = useCallback(() => {
+    setIsLocked(true);
+  }, []);
+
+  const unlockStation = useCallback((pin: string, userId?: string): boolean => {
+    const target = userId ? userProfiles.find(u => u.id === userId) : activeUser;
+    if (target && target.pinCode === pin && target.isActive) {
+      setActiveUser(target);
+      setIsLocked(false);
+      return true;
+    }
+    const matched = userProfiles.find(u => u.pinCode === pin && u.isActive);
+    if (matched) {
+      setActiveUser(matched);
+      setIsLocked(false);
+      return true;
+    }
+    return false;
+  }, [userProfiles, activeUser]);
+
+  const switchUserByProfileId = useCallback((id: string) => {
+    const found = userProfiles.find(u => u.id === id);
+    if (found) {
+      setActiveUser(found);
+    }
+  }, [userProfiles]);
+
+  const verifyManagerPin = useCallback((pin: string): boolean => {
+    return userProfiles.some(
+      u => u.isActive && (u.role === 'OWNER' || u.role === 'BRANCH_MANAGER') && u.pinCode === pin
+    );
+  }, [userProfiles]);
+
+  const addUserProfile = async (profileData: Omit<UserProfile, 'id'>): Promise<UserProfile> => {
+    const branchUuid = BRANCH_CODE_TO_UUID[profileData.branchId] || BRANCH_CODE_TO_UUID.ACCRA_MAIN;
+    const { data } = await supabase
+      .from('user_profiles')
+      .insert({
+        full_name: profileData.fullName,
+        email: profileData.email,
+        pin_code: profileData.pinCode,
+        role: profileData.role,
+        branch_id: branchUuid,
+        is_active: profileData.isActive,
+      })
+      .select()
+      .single();
+
+    const newUser: UserProfile = {
+      id: data?.id || `u-${Date.now()}`,
+      fullName: profileData.fullName,
+      email: profileData.email,
+      pinCode: profileData.pinCode,
+      role: profileData.role,
+      branchId: profileData.branchId,
+      isActive: profileData.isActive,
+    };
+
+    setUserProfiles(prev => [newUser, ...prev]);
+    return newUser;
+  };
+
+  const updateUserProfile = async (id: string, updates: Partial<UserProfile>) => {
+    const dbUpdates: any = {};
+    if (updates.fullName !== undefined) dbUpdates.full_name = updates.fullName;
+    if (updates.email !== undefined) dbUpdates.email = updates.email;
+    if (updates.pinCode !== undefined) dbUpdates.pin_code = updates.pinCode;
+    if (updates.role !== undefined) dbUpdates.role = updates.role;
+    if (updates.isActive !== undefined) dbUpdates.is_active = updates.isActive;
+    if (updates.branchId !== undefined) {
+      dbUpdates.branch_id = BRANCH_CODE_TO_UUID[updates.branchId] || BRANCH_CODE_TO_UUID.ACCRA_MAIN;
+    }
+
+    await supabase.from('user_profiles').update(dbUpdates).eq('id', id);
+
+    setUserProfiles(prev =>
+      prev.map(u => (u.id === id ? { ...u, ...updates } : u))
+    );
+    if (activeUser?.id === id) {
+      setActiveUser(prev => ({ ...prev, ...updates }));
+    }
+  };
+
+  // Global [F10] Key Lock Listener
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F10') {
+        e.preventDefault();
+        setIsLocked(true);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
   // Function to load live data directly from Supabase
   const refreshLiveData = useCallback(async () => {
     try {
+      // 0. Fetch User Profiles
+      const { data: uData } = await supabase.from('user_profiles').select('*');
+      if (uData && uData.length > 0) {
+        const mappedUsers: UserProfile[] = uData.map(u => ({
+          id: u.id,
+          fullName: u.full_name,
+          email: u.email,
+          pinCode: u.pin_code || '1234',
+          role: u.role || 'CASHIER',
+          branchId: (UUID_TO_BRANCH_CODE[u.branch_id] || 'ACCRA_MAIN') as BranchId,
+          isActive: u.is_active ?? true,
+        }));
+        setUserProfiles(mappedUsers);
+        setActiveUser(prev => mappedUsers.find(mu => mu.id === prev?.id) || mappedUsers[0]);
+      }
+
       // 1. Fetch Branches
       const { data: bData } = await supabase.from('branches').select('*');
       if (bData && bData.length > 0) {
@@ -463,7 +594,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             subtotal: cartSubtotal,
             discount: cartDiscount,
             total_amount: cartTotal,
-            attendant_name: activeBranch.manager,
+            attendant_name: activeUser?.fullName || activeBranch.manager,
           })
           .select()
           .single();
@@ -512,7 +643,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           prescribingDoctor: payment.prescribingDoctor || patientDetails.doctor,
           rxNumber: payment.rxNumber || patientDetails.rxNumber,
         },
-        attendantName: activeBranch.manager,
+        attendantName: activeUser?.fullName || activeBranch.manager,
         synced: true,
       };
 
@@ -537,7 +668,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         tax: 0,
         total: cartTotal,
         payment,
-        attendantName: activeBranch.manager,
+        attendantName: activeUser?.fullName || activeBranch.manager,
         synced: true,
       };
       setLastCompletedSale(newSale);
@@ -571,7 +702,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       quantity: firstItem?.quantity || 1,
       status: 'DISPATCHED',
       notes: notes || 'Inter-branch stock transfer',
-      requested_by: activeBranch.manager,
+      requested_by: activeUser?.fullName || activeBranch.manager,
     });
 
     await refreshLiveData();
@@ -597,7 +728,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       items: transferItems,
       status: 'DISPATCHED',
       notes,
-      requestedBy: activeBranch.manager,
+      requestedBy: activeUser?.fullName || activeBranch.manager,
       createdAt: new Date().toISOString(),
     };
 
@@ -666,6 +797,15 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   return (
     <PharmacyContext.Provider
       value={{
+        userProfiles,
+        activeUser,
+        isLocked,
+        lockStation,
+        unlockStation,
+        switchUserByProfileId,
+        addUserProfile,
+        updateUserProfile,
+        verifyManagerPin,
         isLoading,
         branches,
         activeBranchId,

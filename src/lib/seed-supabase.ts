@@ -46,6 +46,44 @@ export async function seedLiveSupabaseDatabase() {
     console.log('✅ Branches verified / created.');
   }
 
+  // 1.1 Pre-seed 3 demo counter user profiles
+  const userProfiles = [
+    {
+      id: 'u0000000-0001-4000-8000-000000000001',
+      full_name: 'Dr. Kwame Mensah',
+      email: 'kwame.mensah@pharmasync.gh',
+      pin_code: '9999',
+      role: 'OWNER',
+      branch_id: 'a1b2c3d4-0001-4000-8000-000000000001',
+      is_active: true,
+    },
+    {
+      id: 'u0000000-0002-4000-8000-000000000002',
+      full_name: 'Abena Osei',
+      email: 'abena.osei@pharmasync.gh',
+      pin_code: '5555',
+      role: 'BRANCH_MANAGER',
+      branch_id: 'a1b2c3d4-0002-4000-8000-000000000002',
+      is_active: true,
+    },
+    {
+      id: 'u0000000-0003-4000-8000-000000000003',
+      full_name: 'Kofi Boateng',
+      email: 'kofi.boateng@pharmasync.gh',
+      pin_code: '1234',
+      role: 'CASHIER',
+      branch_id: 'a1b2c3d4-0003-4000-8000-000000000003',
+      is_active: true,
+    },
+  ];
+
+  const { error: userErr } = await supabase.from('user_profiles').upsert(userProfiles, { onConflict: 'email' });
+  if (userErr) {
+    console.warn('User profiles table notice:', userErr.message);
+  } else {
+    console.log('✅ Demo counter user profiles pre-seeded.');
+  }
+
   // 2. Ghanaian Medicines Catalog
   const medicines = [
     // Anti-Malarials
