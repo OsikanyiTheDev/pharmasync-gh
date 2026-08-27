@@ -286,16 +286,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       </div>
 
       {/* Footer Totals & Quick Pay Grid */}
-      <div className="border-t border-slate-200 pt-3 space-y-3">
+      <div className="border-t border-slate-100 dark:border-white/5 pt-3 space-y-3">
         
-        {/* Subtotal & Discount */}
-        <div className="space-y-1 text-xs">
-          <div className="flex justify-between text-slate-600">
+        {/* Subtotal & Discount Box */}
+        <div className="bg-slate-50 border border-slate-100/80 dark:bg-white/5 dark:border-white/5 p-3 rounded-xl space-y-1 text-xs text-slate-900 dark:text-white">
+          <div className="flex justify-between text-slate-600 dark:text-slate-400">
             <span>Subtotal:</span>
-            <span className="font-semibold tabular-nums">GH₵ {cartSubtotal.toFixed(2)}</span>
+            <span className="font-semibold tabular-nums text-slate-900 dark:text-white">GH₵ {cartSubtotal.toFixed(2)}</span>
           </div>
 
-          <div className="flex justify-between items-center text-slate-600">
+          <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
             <span>Discount (GH₵):</span>
             <input
               type="number"
@@ -303,13 +303,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               value={cartDiscount || ''}
               onChange={(e) => setCartDiscount(parseFloat(e.target.value) || 0)}
               placeholder="0.00"
-              className="w-20 p-1 bg-slate-50 border border-slate-300 rounded text-right text-xs font-bold text-slate-900"
+              className="w-20 p-1 bg-white dark:bg-[#161719] border border-slate-200 dark:border-white/10 rounded text-right text-xs font-bold text-slate-900 dark:text-white"
             />
           </div>
 
-          <div className="flex justify-between items-center text-base font-black text-slate-900 pt-1.5 border-t border-slate-200">
+          <div className="flex justify-between items-center text-base font-bold text-slate-900 dark:text-white pt-1.5 border-t border-slate-200/80 dark:border-white/10">
             <span>NET TOTAL DUE:</span>
-            <span className="text-xl text-teal-800 tabular-nums font-black">GH₵ {cartTotal.toFixed(2)}</span>
+            <span className="text-xl text-[#4E60FF] tabular-nums font-bold">GH₵ {cartTotal.toFixed(2)}</span>
           </div>
         </div>
 

@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
   return (
     <>
       {/* Mobile Top Header (Visible only on < md screens) */}
-      <div className="md:hidden sticky top-0 z-40 bg-white dark:bg-[#121315] text-slate-900 dark:text-white border-b border-slate-100/80 dark:border-white/5 px-4 py-3 flex items-center justify-between shadow-xs">
+      <div className="md:hidden sticky top-0 z-40 bg-white dark:bg-[#121315] text-slate-900 dark:text-slate-100 border-b border-slate-200/80 dark:border-white/5 px-4 py-3 flex items-center justify-between shadow-xs">
         <Link href="/" className="flex items-center space-x-2.5">
           <div className="bg-[#FBBF24] p-2 rounded-xl text-slate-950 shadow-xs flex items-center justify-center">
             <Pill className="w-5 h-5" />
@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
         <div className="flex items-center space-x-2">
           <button
             onClick={toggleTheme}
-            className="p-2 bg-slate-50 dark:bg-[#222327] border border-slate-100 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl transition-all"
+            className="p-2 bg-slate-100 dark:bg-[#222327] border border-slate-200/80 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl transition-all"
             title="Toggle Light/Dark Theme"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-[#4E60FF]" />}
@@ -70,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
 
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="p-2 bg-slate-50 dark:bg-[#222327] text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5"
+            className="p-2 bg-slate-100 dark:bg-[#222327] text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5"
           >
             {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -87,13 +87,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
 
       {/* Main Sidebar Container */}
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-white dark:bg-[#121315] border-r border-slate-100/80 dark:border-white/5 text-slate-900 dark:text-white flex flex-col justify-between transition-all duration-200 ease-in-out ${
+        className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-white dark:bg-[#121315] border-r border-slate-200/80 dark:border-white/5 text-slate-900 dark:text-slate-100 flex flex-col justify-between transition-all duration-200 ease-in-out ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         
         {/* Top Header & Brand Area */}
-        <div className="p-5 border-b border-slate-100 dark:border-white/5 space-y-4">
+        <div className="p-5 border-b border-slate-200/80 dark:border-white/5 space-y-4 bg-white dark:bg-[#121315]">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-3 group">
               <div className="bg-[#FBBF24] p-2.5 rounded-xl text-slate-950 shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
                     GH
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400 font-medium">Pharmacy System</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Pharmacy System</p>
               </div>
             </Link>
 
@@ -119,14 +119,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
           </div>
 
           {/* Active Branch Switcher Dropdown */}
-          <div className="bg-slate-50 dark:bg-[#161719] border border-slate-100 dark:border-white/5 p-2.5 rounded-xl space-y-1">
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Active Branch</span>
+          <div className="bg-slate-50 dark:bg-[#161719] border border-slate-200/80 dark:border-white/5 p-2.5 rounded-xl space-y-1">
+            <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Active Branch</span>
             <div className="flex items-center space-x-2">
               <Building2 className="w-4 h-4 text-[#4E60FF] flex-shrink-0" />
               <select
                 value={activeBranchId}
                 onChange={(e) => setActiveBranchId(e.target.value as any)}
-                className="w-full bg-transparent text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
+                className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer"
               >
                 {branches.map((b) => (
                   <option key={b.id} value={b.id} className="bg-white dark:bg-[#121315] text-slate-900 dark:text-white">
@@ -139,8 +139,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
         </div>
 
         {/* Middle Navigation Links */}
-        <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <p className="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Main Menu</p>
+        <div className="flex-1 px-3 py-4 space-y-1 overflow-y-auto bg-white dark:bg-[#121315]">
+          <p className="px-3 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Main Menu</p>
           
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -153,11 +153,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
                 className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-medium transition-all ${
                   isActive
                     ? 'bg-[#4E60FF] text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5'
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />
                   <span>{item.label}</span>
                 </div>
 
@@ -165,7 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
                   <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
                     isActive
                       ? 'bg-white/20 text-white'
-                      : 'bg-slate-100 text-slate-500 dark:bg-[#222327] dark:text-slate-400'
+                      : 'bg-slate-100 text-slate-600 dark:bg-[#222327] dark:text-slate-400'
                   }`}>
                     {item.badge}
                   </span>
@@ -187,7 +187,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
         </div>
 
         {/* Bottom Profile, Theme Toggle & Keyboard Shortcut Area */}
-        <div className="p-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#161719] space-y-3">
+        <div className="p-4 border-t border-slate-200/80 dark:border-white/5 bg-white dark:bg-[#121315] space-y-3">
           
           {/* Status & Shortcuts Row */}
           <div className="flex items-center justify-between text-xs">
@@ -215,7 +215,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
             {/* Theme Switcher Button */}
             <button
               onClick={toggleTheme}
-              className="flex items-center space-x-1.5 px-2.5 py-1 bg-white dark:bg-[#222327] hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all border border-slate-200 dark:border-white/5 shadow-2xs"
+              className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-100 dark:bg-[#222327] hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all border border-slate-200/80 dark:border-white/5 shadow-2xs"
               title="Toggle Light / Dark Theme"
             >
               {theme === 'dark' ? (
@@ -233,7 +233,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
 
             <button
               onClick={onOpenShortcuts}
-              className="p-1.5 bg-white dark:bg-[#222327] hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-white/5 shadow-2xs"
+              className="p-1.5 bg-slate-100 dark:bg-[#222327] hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 rounded-lg border border-slate-200/80 dark:border-white/5 shadow-2xs"
               title="Shortcuts [?]"
             >
               <Keyboard className="w-3.5 h-3.5" />
@@ -241,14 +241,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
           </div>
 
           {/* Active Cashier Profile */}
-          <div className="pt-2 border-t border-slate-200/60 dark:border-white/5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <div className="pt-2 border-t border-slate-200/80 dark:border-white/5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
             <div className="flex items-center space-x-2">
               <div className="w-7 h-7 rounded-full bg-[#4E60FF]/10 text-[#4E60FF] dark:bg-[#4E60FF]/20 dark:text-[#4E60FF] flex items-center justify-center font-bold text-xs">
                 {activeBranch.manager[0]}
               </div>
               <div>
-                <p className="text-slate-900 dark:text-slate-200 font-bold text-[11px] leading-tight">{activeBranch.manager}</p>
-                <p className="text-[9px] text-slate-400">Pharmacist</p>
+                <p className="text-slate-900 dark:text-slate-100 font-bold text-[11px] leading-tight">{activeBranch.manager}</p>
+                <p className="text-[9px] text-slate-500 dark:text-slate-400">Pharmacist</p>
               </div>
             </div>
             <UserCheck className="w-4 h-4 text-emerald-500" />

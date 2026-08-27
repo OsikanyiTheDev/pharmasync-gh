@@ -91,10 +91,10 @@ export const ProductSearch: React.FC = () => {
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap cursor-pointer ${
               selectedCategory === cat
-                ? 'bg-teal-700 text-white shadow-sm'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                ? 'bg-[#4E60FF] text-white shadow-sm'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/5 dark:text-slate-400 dark:hover:text-white'
             }`}
           >
             {cat === 'ALL' ? 'All Medicines' : cat}
