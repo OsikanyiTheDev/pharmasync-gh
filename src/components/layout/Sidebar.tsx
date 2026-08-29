@@ -15,17 +15,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
   const { isOnline, syncQueue, toggleOfflineSimulation } = useOffline();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const isCashier = activeUser?.role === 'CASHIER';
+  const userRole = activeUser?.role || 'CASHIER';
 
-  const navItems = [
-    { href: '/', label: 'POS Dispensing', icon: Pill, badge: null, restricted: false },
-    { href: '/inventory', label: 'Multi-Branch Inventory', icon: Package, badge: 'FEFO', restricted: false },
-    { href: '/inventory/import', label: 'Bulk Stock Importer', icon: FileSpreadsheet, badge: 'CSV', restricted: isCashier },
-    { href: '/restock', label: 'Wholesale Restock', icon: Truck, badge: 'Market', restricted: isCashier },
-    { href: '/analytics', label: 'Sales & Profit', icon: BarChart3, badge: isCashier ? '🔒 PIN' : 'KPI', restricted: isCashier },
-    { href: '/transfers', label: 'Stock Transfers', icon: RefreshCw, badge: null, restricted: false },
-    { href: '/users', label: 'Staff & PIN Management', icon: Users, badge: 'Staff', restricted: false },
-  ];
+  let navItems: { href: string; label: string; icon: any; badge: string | null }[] = [];
+  if (userRole === 'CASHIER') {
+    navItems = [
+      { href: '/', label: 'POS Dispensing', icon: Pill, badge: null },
+      { href: '/inventory', label: 'Branch Inventory', icon: Package, badge: 'FEFO' },
+      { href: '/analytics', label: 'Daily Sales', icon: BarChart3, badge: 'KPI' },
+    ];
+  } else if (userRole === 'BRANCH_MANAGER') {
+    navItems = [
+      { href: '/', label: 'POS Dispensing', icon: Pill, badge: null },
+      { href: '/inventory', label: 'Branch Inventory', icon: Package, badge: 'FEFO' },
+      { href: '/transfers', label: 'Stock Transfers', icon: RefreshCw, badge: null },
+      { href: '/analytics', label: 'Branch Sales & Trends', icon: BarChart3, badge: 'KPI' },
+    ];
+  } else {
+    // OWNER
+    navItems = [
+      { href: '/', label: 'POS Dispensing', icon: Pill, badge: null },
+      { href: '/inventory', label: 'Multi-Branch Inventory', icon: Package, badge: 'FEFO' },
+      { href: '/inventory/import', label: 'Bulk Stock Importer', icon: FileSpreadsheet, badge: 'CSV' },
+      { href: '/restock', label: 'Wholesale Restock', icon: Truck, badge: 'Market' },
+      { href: '/transfers', label: 'Stock Transfers', icon: RefreshCw, badge: null },
+      { href: '/analytics', label: 'Sales & Profit', icon: BarChart3, badge: 'KPI' },
+      { href: '/users', label: 'Staff & PIN Management', icon: Users, badge: 'Staff' },
+    ];
+  }
 
   const roleColor = 
     activeUser?.role === 'OWNER' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
@@ -55,7 +72,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenShortcuts }) => {
           </div>
           <div className="bg-[#F3F4F7] border border-slate-100 p-2.5 rounded-xl space-y-1">
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Branch Location</span>
-            <div className="flex items-center space-x-2"><MapPin className="w-4 h-4 text-[#4E60FF] flex-shrink-0" /><select value={activeBranchId} onChange={(e) => setActiveBranchId(e.target.value as any)} className="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none cursor-pointer">{branches.map((b) => <option key={b.id} value={b.id} className="bg-white text-slate-900">{b.name}</option>)}</select></div>
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-4 h-4 text-[#4E60FF] flex-shrink-0" />
+              {userRole === 'OWNER' ? (
+                <select
+                  value={activeBranchId}
+                  onChange={(e) => setActiveBranchId(e.target.value as any)}
+                  className="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none cursor-pointer"
+                >
+                  {branches.map((b) => (
+                    <option key={b.id} value={b.id} className="bg-white text-slate-900">{b.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <span className="text-xs font-bold text-slate-900 truncate">
+                  {activeBranch?.name || activeBranchId}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

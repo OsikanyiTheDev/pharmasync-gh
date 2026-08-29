@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePharmacy } from '../../context/PharmacyContext';
+import { useToast } from '../../context/ToastContext';
 import { UserRole, BranchId, UserProfile } from '../../lib/types';
 import { ManagerPinModal } from '../../components/auth/ManagerPinModal';
 import { 
@@ -24,6 +26,17 @@ import {
 
 export default function UsersPage() {
   const { userProfiles, activeUser, branches, addUserProfile, updateUserProfile } = usePharmacy();
+  const { showToast } = useToast();
+  const router = useRouter();
+
+  // Strict Route Guard: Only OWNER can access Staff Management
+  useEffect(() => {
+    if (activeUser?.role !== 'OWNER') {
+      showToast('Access Denied: Owner Authorization Required', 'error', 'Only system owners can manage staff profiles or reset PINs.');
+      router.replace('/');
+    }
+  }, [activeUser, router, showToast]);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [showPins, setShowPins] = useState<Record<string, boolean>>({});
 
@@ -37,8 +50,8 @@ export default function UsersPage() {
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
 
-  // Manager Elevation for Cashier trying to perform admin actions
-  const [isManagerAuthorized, setIsManagerAuthorized] = useState(activeUser.role !== 'CASHIER');
+  // Manager Elevation state (Owners are fully authorized)
+  const [isManagerAuthorized, setIsManagerAuthorized] = useState(true);
   const [isManagerModalOpen, setIsManagerModalOpen] = useState(false);
 
   // Edit PIN Modal
@@ -46,7 +59,9 @@ export default function UsersPage() {
   const [editPin, setEditPin] = useState('');
   const [editRole, setEditRole] = useState<UserRole>('CASHIER');
 
-  const isOwner = activeUser.role === 'OWNER';
+  if (activeUser?.role !== 'OWNER') {
+    return null;
+  }
 
   const togglePinVisibility = (id: string) => {
     if (!isManagerAuthorized) {
@@ -146,25 +161,6 @@ export default function UsersPage() {
           <span>Add New Staff Account</span>
         </button>
       </div>
-
-      {/* Cashier Restricted Elevation Notice Banner */}
-      {activeUser.role === 'CASHIER' && !isManagerAuthorized && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between">
-          <div className="flex items-center space-x-3 text-amber-800 text-xs">
-            <ShieldAlert className="w-5 h-5 flex-shrink-0 text-amber-600" />
-            <div>
-              <p className="font-bold">Manager Approval Required for Full Access</p>
-              <p className="text-[11px] text-amber-700">You are logged in as Cashier. Unlocking PINs or adding staff requires Manager authorization.</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setIsManagerModalOpen(true)}
-            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
-          >
-            Authorize Manager PIN
-          </button>
-        </div>
-      )}
 
       {/* Filter and Search Bar */}
       <div className="bg-white border border-slate-100/60 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">

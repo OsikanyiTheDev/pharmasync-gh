@@ -1,13 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePharmacy } from '../../context/PharmacyContext';
+import { useToast } from '../../context/ToastContext';
 import { RefreshCw, ArrowRight, CheckCircle2, Building2, Plus, Package } from 'lucide-react';
 import { StockTransferModal } from '../../components/inventory/StockTransferModal';
 
 export default function TransfersPage() {
-  const { transfers, branches, receiveTransfer } = usePharmacy();
+  const { transfers, branches, receiveTransfer, activeUser } = usePharmacy();
+  const { showToast } = useToast();
+  const router = useRouter();
+
+  // Route Guard: CASHIER cannot access Stock Transfers
+  useEffect(() => {
+    if (activeUser?.role === 'CASHIER') {
+      showToast('Access Denied: Manager Authorization Required', 'error', 'Inter-branch stock transfers require Manager or Owner privileges.');
+      router.replace('/');
+    }
+  }, [activeUser, router, showToast]);
+
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+
+  if (activeUser?.role === 'CASHIER') {
+    return null;
+  }
 
   return (
     <div className="space-y-6 text-slate-900 pb-12">

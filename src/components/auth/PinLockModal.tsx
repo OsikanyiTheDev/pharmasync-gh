@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Lock, Unlock, ShieldAlert, KeyRound, UserCheck, Building2, Delete } from 'lucide-react';
+import { Lock, Unlock, ShieldAlert, KeyRound, UserCheck, Building2, Delete, Pill } from 'lucide-react';
 import { usePharmacy } from '../../context/PharmacyContext';
 
 export const PinLockModal: React.FC = () => {
@@ -83,9 +83,25 @@ export const PinLockModal: React.FC = () => {
   if (!isLocked) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 bg-[#F3F4F7] overflow-y-auto flex flex-col items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200 min-h-screen w-screen">
+      
+      {/* Top Branding Bar */}
+      <div className="mb-6 text-center space-y-1">
+        <div className="inline-flex items-center space-x-2.5 bg-white px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm mb-2">
+          <div className="bg-[#FBBF24] p-2 rounded-xl text-slate-950 shadow-xs flex items-center justify-center">
+            <Pill className="w-5 h-5" />
+          </div>
+          <span className="font-black text-xl tracking-tight text-slate-900">
+            PharmaSync <span className="text-[#4E60FF]">GH</span>
+          </span>
+        </div>
+        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+          Ghanaian Multi-Branch Retail Pharmacy System
+        </p>
+      </div>
+
       <div 
-        className={`bg-white border border-slate-100 rounded-3xl max-w-md w-full p-7 text-slate-900 shadow-2xl relative overflow-hidden transition-all transform ${
+        className={`bg-white border border-slate-100/80 rounded-3xl max-w-md w-full p-7 text-slate-900 shadow-2xl relative overflow-hidden transition-all transform ${
           isShaking ? 'animate-bounce border-red-500 ring-4 ring-red-500/20' : ''
         }`}
       >
@@ -93,15 +109,15 @@ export const PinLockModal: React.FC = () => {
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4E60FF] via-[#FBBF24] to-[#10B981]" />
 
         {/* Modal Header */}
-        <div className="text-center space-y-2 mb-6 pt-2">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[#4E60FF]/10 text-[#4E60FF] flex items-center justify-center border border-[#4E60FF]/20 shadow-xs mb-3">
-            <Lock className="w-7 h-7" />
+        <div className="text-center space-y-1.5 mb-5 pt-1">
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-[#4E60FF]/10 text-[#4E60FF] flex items-center justify-center border border-[#4E60FF]/20 shadow-xs mb-2">
+            <Lock className="w-6 h-6" />
           </div>
           <h2 className="text-xl font-black tracking-tight text-slate-900">
-            Station Locked — Quick PIN Unlock
+            Station PIN Sign-In
           </h2>
           <p className="text-xs text-slate-500 font-medium">
-            Enter 4-digit PIN to authorize counter dispensing session
+            Select attendant profile & enter 4-digit PIN to unlock
           </p>
         </div>
 

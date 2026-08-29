@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePharmacy } from '../../context/PharmacyContext';
 import { getMarketRestockList } from '../../lib/fefo';
 import { Product } from '../../lib/types';
@@ -21,12 +22,25 @@ import {
 import { useToast } from '../../context/ToastContext';
 
 export default function RestockPage() {
-  const { products, batches } = usePharmacy();
+  const { products, batches, activeUser } = usePharmacy();
   const { showToast } = useToast();
+  const router = useRouter();
+
+  // Route Guard: Only OWNER can access wholesale restock
+  useEffect(() => {
+    if (activeUser?.role !== 'OWNER') {
+      showToast('Access Denied: Owner Authorization Required', 'error', 'Wholesale market restock is restricted to system owners.');
+      router.replace('/');
+    }
+  }, [activeUser, router, showToast]);
 
   const [selectedProductForIntake, setSelectedProductForIntake] = useState<Product | null>(null);
   const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(false);
   const [checkedItemsMap, setCheckedItemsMap] = useState<Record<string, boolean>>({});
+
+  if (activeUser?.role !== 'OWNER') {
+    return null;
+  }
 
   const restockItems = getMarketRestockList(products, batches);
   

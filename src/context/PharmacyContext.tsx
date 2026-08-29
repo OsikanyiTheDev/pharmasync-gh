@@ -116,7 +116,7 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // User Profiles & Auth PIN Lock State
   const [userProfiles, setUserProfiles] = useState<UserProfile[]>(INITIAL_USER_PROFILES);
   const [activeUser, setActiveUser] = useState<UserProfile>(INITIAL_USER_PROFILES[0]);
-  const [isLocked, setIsLocked] = useState<boolean>(false);
+  const [isLocked, setIsLocked] = useState<boolean>(true);
 
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [batches, setBatches] = useState<Batch[]>(INITIAL_BATCHES);
@@ -141,12 +141,18 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const target = userId ? userProfiles.find(u => u.id === userId) : activeUser;
     if (target && target.pinCode === pin && target.isActive) {
       setActiveUser(target);
+      if (target.branchId) {
+        setActiveBranchId(target.branchId);
+      }
       setIsLocked(false);
       return true;
     }
     const matched = userProfiles.find(u => u.pinCode === pin && u.isActive);
     if (matched) {
       setActiveUser(matched);
+      if (matched.branchId) {
+        setActiveBranchId(matched.branchId);
+      }
       setIsLocked(false);
       return true;
     }
@@ -157,6 +163,9 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const found = userProfiles.find(u => u.id === id);
     if (found) {
       setActiveUser(found);
+      if (found.branchId) {
+        setActiveBranchId(found.branchId);
+      }
     }
   }, [userProfiles]);
 

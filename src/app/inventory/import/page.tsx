@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Papa from 'papaparse';
 import { 
   FileSpreadsheet, 
@@ -38,8 +39,17 @@ export interface ValidatedImportRow extends CSVImportRow {
 }
 
 export default function BulkStockImportPage() {
-  const { branches, recordMarketIntake } = usePharmacy();
+  const { branches, recordMarketIntake, activeUser } = usePharmacy();
   const { showToast } = useToast();
+  const router = useRouter();
+
+  // Route Guard: Only OWNER can access Bulk Import
+  useEffect(() => {
+    if (activeUser?.role !== 'OWNER') {
+      showToast('Access Denied: Owner Authorization Required', 'error', 'Bulk CSV stock importer is restricted to system owners.');
+      router.replace('/');
+    }
+  }, [activeUser, router, showToast]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -47,6 +57,10 @@ export default function BulkStockImportPage() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [importSuccessCount, setImportSuccessCount] = useState<number | null>(null);
+
+  if (activeUser?.role !== 'OWNER') {
+    return null;
+  }
 
   const handleDownloadTemplate = () => {
     const csvContent = [

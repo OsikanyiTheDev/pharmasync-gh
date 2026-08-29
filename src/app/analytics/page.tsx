@@ -21,8 +21,12 @@ import { BranchId } from '../../lib/types';
 const safeNum = (val: any) => (isNaN(Number(val)) || val === null || val === undefined ? 0 : Number(val));
 
 export default function AnalyticsPage() {
-  const { sales, products, branches, isLoading } = usePharmacy();
+  const { sales, products, branches, isLoading, activeUser, activeBranchId } = usePharmacy();
   const [timeFilter, setTimeFilter] = useState<'TODAY' | 'WEEK' | 'MONTH' | 'ALL'>('ALL');
+
+  const isCashier = activeUser?.role === 'CASHIER';
+  const isManager = activeUser?.role === 'BRANCH_MANAGER';
+  const isOwner = activeUser?.role === 'OWNER';
 
   // Skeleton Loading State (Zero Flicker)
   if (isLoading) {
@@ -47,9 +51,15 @@ export default function AnalyticsPage() {
     );
   }
 
+  // Filter sales by user branch restriction
+  const userBranchId = activeUser?.branchId || activeBranchId;
+  const roleBranchFilteredSales = isOwner
+    ? sales
+    : sales.filter(s => s.branchId === userBranchId);
+
   // Filter sales by time
   const now = new Date().getTime();
-  const filteredSales = sales.filter(s => {
+  const filteredSales = roleBranchFilteredSales.filter(s => {
     const saleTime = new Date(s.timestamp).getTime();
     const diffHours = (now - saleTime) / (1000 * 3600);
 
@@ -146,8 +156,16 @@ export default function AnalyticsPage() {
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">Executive Sales & Financial Dashboard</h1>
-            <p className="text-xs text-slate-500 font-medium">Gross profit margins, payment channel breakdowns, and inventory velocity</p>
+            <h1 className="text-xl font-bold text-slate-900">
+              {isCashier ? 'Daily Counter Sales Summary' : isManager ? 'Branch Sales & Performance Trends' : 'Executive Sales & Financial Dashboard'}
+            </h1>
+            <p className="text-xs text-slate-500 font-medium">
+              {isCashier 
+                ? 'Track gross counter revenue and issued receipts for your branch'
+                : isManager
+                ? 'Branch revenue, payment channels, and fast-moving medicine velocity'
+                : 'Gross profit margins, COGS, payment channel breakdowns, and multi-branch comparison'}
+            </p>
           </div>
         </div>
 
@@ -169,8 +187,10 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Primary Executive Metric Cards (Reference Circular Icon Layout) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Primary Executive Metric Cards */}
+      <div className={`grid grid-cols-1 gap-4 ${
+        isOwner ? 'sm:grid-cols-2 lg:grid-cols-4' : isManager ? 'sm:grid-cols-2' : 'sm:grid-cols-2'
+      }`}>
         
         {/* Total Revenue - Green Icon Pill */}
         <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center space-x-4">
@@ -184,41 +204,61 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* COGS - Blue Icon Pill */}
-        <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center space-x-4">
-          <div className="bg-[#4E60FF] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
-            <Layers className="w-6 h-6" />
+        {/* Total Receipts / Transactions Card for Cashier */}
+        {isCashier && (
+          <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center space-x-4">
+            <div className="bg-[#4E60FF] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
+              <Receipt className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Branch Receipts Issued</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">{filteredSales.length}</p>
+              <span className="text-slate-500 text-xs font-medium">Completed counter transactions</span>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">Cost of Goods (COGS)</p>
-            <p className="text-2xl font-bold text-slate-900 tabular-nums">GH₵ {totalCOGS.toFixed(2)}</p>
-            <span className="text-slate-500 text-xs font-medium">Wholesale medicine cost</span>
-          </div>
-        </div>
+        )}
 
-        {/* Gross Profit - Amber Icon Pill */}
-        <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center space-x-4">
-          <div className="bg-[#F59E0B] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
-            <Percent className="w-6 h-6" />
+        {/* COGS - Blue Icon Pill (OWNER ONLY) */}
+        {isOwner && (
+          <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center space-x-4">
+            <div className="bg-[#4E60FF] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
+              <Layers className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Cost of Goods (COGS)</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">GH₵ {totalCOGS.toFixed(2)}</p>
+              <span className="text-slate-500 text-xs font-medium">Wholesale medicine cost</span>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">Gross Profit & Margin</p>
-            <p className="text-2xl font-bold text-slate-900 tabular-nums">GH₵ {grossProfit.toFixed(2)}</p>
-            <span className="text-[#10B981] text-xs font-semibold">{marginPercent.toFixed(1)}% Profit Margin</span>
-          </div>
-        </div>
+        )}
 
-        {/* Avg Basket Value - Blue Icon Pill */}
-        <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center space-x-4">
-          <div className="bg-[#4E60FF] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
-            <Receipt className="w-6 h-6" />
+        {/* Gross Profit - Amber Icon Pill (OWNER ONLY) */}
+        {isOwner && (
+          <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center space-x-4">
+            <div className="bg-[#F59E0B] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
+              <Percent className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Gross Profit & Margin</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">GH₵ {grossProfit.toFixed(2)}</p>
+              <span className="text-[#10B981] text-xs font-semibold">{marginPercent.toFixed(1)}% Profit Margin</span>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-slate-500 font-medium">Avg Order Basket Value</p>
-            <p className="text-2xl font-bold text-slate-900 tabular-nums">GH₵ {avgBasketValue.toFixed(2)}</p>
-            <span className="text-slate-500 text-xs font-medium">Per patient sale</span>
+        )}
+
+        {/* Avg Basket Value - Blue Icon Pill (OWNER & MANAGER) */}
+        {(isOwner || isManager) && (
+          <div className="p-5 bg-white border border-slate-100/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center space-x-4">
+            <div className="bg-[#4E60FF] text-white p-3.5 rounded-full flex-shrink-0 shadow-sm">
+              <Receipt className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Avg Order Basket Value</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">GH₵ {avgBasketValue.toFixed(2)}</p>
+              <span className="text-slate-500 text-xs font-medium">Per patient sale</span>
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
 
@@ -226,7 +266,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
         {/* Payment Channels (Cash vs MTN MoMo vs Telecel MoMo) */}
-        <div className="lg:col-span-6 bg-white border border-slate-100/60 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
+        <div className={`${isOwner ? 'lg:col-span-6' : 'lg:col-span-12'} bg-white border border-slate-100/60 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4`}>
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center space-x-2">
               <CreditCard className="w-5 h-5 text-[#4E60FF]" />
@@ -283,37 +323,39 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Branch Revenue Comparison */}
-        <div className="lg:col-span-6 bg-white border border-slate-100/60 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div className="flex items-center space-x-2">
-              <Building2 className="w-5 h-5 text-[#4E60FF]" />
-              <h3 className="font-bold text-base text-slate-900">Branch Revenue Distribution</h3>
+        {/* Branch Revenue Comparison (OWNER ONLY) */}
+        {isOwner && (
+          <div className="lg:col-span-6 bg-white border border-slate-100/60 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center space-x-2">
+                <Building2 className="w-5 h-5 text-[#4E60FF]" />
+                <h3 className="font-bold text-base text-slate-900">Branch Revenue Distribution</h3>
+              </div>
+              <span className="text-[#4E60FF] text-xs font-semibold hover:underline cursor-pointer">See All &gt;</span>
             </div>
-            <span className="text-[#4E60FF] text-xs font-semibold hover:underline cursor-pointer">See All &gt;</span>
-          </div>
 
-          <div className="space-y-4">
-            {branches.map(branch => {
-              const rev = branchRevenue[branch.id] || 0;
-              const percent = totalRevenue > 0 ? (rev / totalRevenue) * 100 : 0;
-              return (
-                <div key={branch.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100/60">
-                  <div className="flex justify-between text-xs font-bold mb-1.5">
-                    <span className="text-slate-900">{branch.name}</span>
-                    <span className="text-[#4E60FF] tabular-nums">GH₵ {rev.toFixed(2)} ({percent.toFixed(0)}%)</span>
+            <div className="space-y-4">
+              {branches.map(branch => {
+                const rev = branchRevenue[branch.id] || 0;
+                const percent = totalRevenue > 0 ? (rev / totalRevenue) * 100 : 0;
+                return (
+                  <div key={branch.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100/60">
+                    <div className="flex justify-between text-xs font-bold mb-1.5">
+                      <span className="text-slate-900">{branch.name}</span>
+                      <span className="text-[#4E60FF] tabular-nums">GH₵ {rev.toFixed(2)} ({percent.toFixed(0)}%)</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="bg-[#4E60FF] h-full rounded-full" 
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="bg-[#4E60FF] h-full rounded-full" 
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
 
