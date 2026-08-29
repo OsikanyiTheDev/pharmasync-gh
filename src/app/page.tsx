@@ -60,6 +60,11 @@ export default function POSPage() {
   const activeSales = sales.filter(s => s.branchId === activeBranchId);
   const totalRevenue = activeSales.reduce((sum, s) => sum + s.total, 0);
 
+  // Live unique customer count (fallback to unique receipt count if no name provided)
+  const uniqueCustomersCount = new Set(
+    sales.map(s => s.customerPhone || s.customerName || s.payment?.customerPhone || s.payment?.customerName).filter(Boolean)
+  ).size || (sales.length > 0 ? sales.length : 0);
+
   // Estimate Profit
   const totalCost = activeSales.reduce((sum, s) => {
     return sum + (s.items || []).reduce((iSum, item) => {
@@ -123,7 +128,7 @@ export default function POSPage() {
   };
 
   return (
-    <div className="space-y-6 text-slate-900 pb-12">
+    <div className="space-y-6 text-slate-900 pb-20 md:pb-6">
       
       {/* 1. Top Dashboard Row (4 Metric Stat Cards with Circular Badges) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -136,7 +141,7 @@ export default function POSPage() {
             </div>
             <div>
               <p className="text-xs text-slate-500 font-medium">Total Customers</p>
-              <p className="text-2xl font-bold text-slate-900 tabular-nums">{120 + activeSales.length}</p>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">{uniqueCustomersCount}</p>
               <Link href="/analytics" className="text-[#4E60FF] text-xs font-semibold hover:underline flex items-center mt-0.5">
                 Show Details &gt;
               </Link>

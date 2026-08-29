@@ -114,6 +114,8 @@ export interface Sale {
   discount: number;
   tax: number;
   total: number;
+  customerName?: string;
+  customerPhone?: string;
   payment: PaymentDetails;
   attendantName: string;
   synced: boolean;

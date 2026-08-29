@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <PharmacyProvider>
                 <div className="flex min-h-screen bg-[#F3F4F7]">
                   <Sidebar onOpenShortcuts={() => setIsKeyboardModalOpen(true)} />
-                  <div className="flex-1 md:pl-64 flex flex-col min-w-0 bg-[#F3F4F7]">
+                  <div className="flex-1 w-full min-w-0 pl-0 md:pl-64 flex flex-col bg-[#F3F4F7]">
                     <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-[#F3F4F7]">
                       {children}
                     </main>

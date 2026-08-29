@@ -326,6 +326,8 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             receiptNumber: s.invoice_number || `INV-${s.id}`,
             branchId: bCode,
             timestamp: s.created_at,
+            customerName: s.customer_name,
+            customerPhone: s.customer_phone,
             items: (s.sale_items || []).map((si: any) => {
               const catalogProd = currentProducts.find(p => p.id === si.medicine_id);
               const costPrice = Number(si.unit_cost_price ?? catalogProd?.costPrice ?? 0);
@@ -640,6 +642,8 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         receiptNumber: result.invoice_number || invoiceNumber,
         branchId: activeBranchId,
         timestamp: new Date().toISOString(),
+        customerName: payment.customerName || patientDetails.name,
+        customerPhone: payment.customerPhone || patientDetails.phone,
         items: [...cart],
         subtotal: cartSubtotal,
         discount: cartDiscount,
@@ -671,6 +675,8 @@ export const PharmacyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         receiptNumber: invoiceNumber,
         branchId: activeBranchId,
         timestamp: new Date().toISOString(),
+        customerName: payment.customerName || patientDetails.name,
+        customerPhone: payment.customerPhone || patientDetails.phone,
         items: [...cart],
         subtotal: cartSubtotal,
         discount: cartDiscount,
