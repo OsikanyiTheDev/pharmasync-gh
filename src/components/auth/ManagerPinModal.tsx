@@ -49,8 +49,8 @@ export const ManagerPinModal: React.FC<ManagerPinModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-100 rounded-2xl max-w-sm w-full p-6 text-slate-900 shadow-2xl relative animate-in fade-in zoom-in-95">
+    <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-100/60 rounded-2xl max-w-sm w-full p-6 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative animate-in fade-in zoom-in-95">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
           <div className="flex items-center space-x-2.5">
             <div className="p-2 bg-amber-50 text-amber-600 rounded-xl border border-amber-200">
