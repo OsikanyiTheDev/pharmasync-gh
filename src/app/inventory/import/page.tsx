@@ -182,7 +182,7 @@ export default function BulkStockImportPage() {
   const invalidCount = parsedRows.filter(r => !r.isValid).length;
 
   return (
-    <div className="space-y-6 text-slate-900 pb-16">
+    <div className="space-y-6 text-slate-900 pb-20 md:pb-6">
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-100/60 p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <div className="flex items-center space-x-3">

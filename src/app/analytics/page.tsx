@@ -31,7 +31,7 @@ export default function AnalyticsPage() {
   // Skeleton Loading State (Zero Flicker)
   if (isLoading) {
     return (
-      <div className="space-y-6 text-slate-900 pb-12">
+      <div className="space-y-6 text-slate-900 pb-20 md:pb-6">
         {/* Skeleton Header */}
         <div className="h-20 bg-white rounded-2xl animate-pulse" />
 
@@ -147,7 +147,7 @@ export default function AnalyticsPage() {
   const slowMoving = rankedProducts.slice(-4).reverse();
 
   return (
-    <div className="space-y-6 text-slate-900 pb-12">
+    <div className="space-y-6 text-slate-900 pb-20 md:pb-6">
       
       {/* Analytics Header & Time Filter */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-100/60 p-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">

@@ -61,7 +61,7 @@ export default function RestockPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 text-slate-900 pb-24">
+    <div className="max-w-2xl mx-auto space-y-6 text-slate-900 pb-24 md:pb-6">
       
       {/* Clinical Market Banner - Floating White Card with Brand Accent */}
       <div className="bg-white border border-slate-100/60 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
