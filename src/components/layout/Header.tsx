@@ -24,16 +24,34 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onOpenShortcuts }) => {
   const pathname = usePathname();
-  const { branches, activeBranchId, setActiveBranchId, activeBranch, heldBills } = usePharmacy();
+  const { branches, activeBranchId, setActiveBranchId, activeBranch, heldBills, activeUser } = usePharmacy();
   const { isOnline, syncQueue, toggleOfflineSimulation } = useOffline();
 
-  const navItems = [
-    { href: '/', label: 'POS Cockpit', icon: Pill },
-    { href: '/inventory', label: 'Inventory & FEFO', icon: Package },
-    { href: '/restock', label: 'Market Restock', icon: Truck },
-    { href: '/analytics', label: 'Sales & Profit', icon: BarChart3 },
-    { href: '/transfers', label: 'Transfers', icon: RefreshCw },
-  ];
+  const userRole = activeUser?.role || 'CASHIER';
+
+  let navItems: { href: string; label: string; icon: any }[] = [];
+  if (userRole === 'CASHIER') {
+    navItems = [
+      { href: '/', label: 'POS Cockpit', icon: Pill },
+      { href: '/inventory', label: 'Branch Inventory', icon: Package },
+      { href: '/analytics', label: 'Daily Sales', icon: BarChart3 },
+    ];
+  } else if (userRole === 'BRANCH_MANAGER') {
+    navItems = [
+      { href: '/', label: 'POS Cockpit', icon: Pill },
+      { href: '/inventory', label: 'Branch Inventory', icon: Package },
+      { href: '/transfers', label: 'Transfers', icon: RefreshCw },
+      { href: '/analytics', label: 'Branch Sales', icon: BarChart3 },
+    ];
+  } else {
+    navItems = [
+      { href: '/', label: 'POS Cockpit', icon: Pill },
+      { href: '/inventory', label: 'Inventory', icon: Package },
+      { href: '/restock', label: 'Market Restock', icon: Truck },
+      { href: '/transfers', label: 'Transfers', icon: RefreshCw },
+      { href: '/analytics', label: 'Sales & Profit', icon: BarChart3 },
+    ];
+  }
 
   return (
     <header className="bg-white border-b border-slate-100 text-slate-900 sticky top-0 z-40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
